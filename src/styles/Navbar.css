@@ -1,0 +1,18 @@
+nav {
+    background-color: #e63e3e;
+    flex-wrap: wrap;
+    padding: 20px;
+    width: 100%;
+    border: 1pt;
+  }
+  
+  nav ul {
+    display: flex;
+    list-style-type: none;
+  }
+
+  nav ul a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px;
+  }
