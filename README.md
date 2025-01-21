@@ -50,7 +50,9 @@ export default tseslint.config({
 ```
 # Accessing API Endpoints
 In order to access the API and make API calls to retrieve data, some steps need to be taken.
-First you want to activate a virtual environment for python through source .../.../swift-ios-quizzes/venv-fastapi/bin/activate
+First you want to activate a virtual environment for python through 
+- source .../.../swift-ios-quizzes/venv-fastapi/bin/activate
+
 Once you're in the virtual environment, install the dependencies
 - pip install "fastapi[standard]"
 - pip install "uvicorn[standard]"
