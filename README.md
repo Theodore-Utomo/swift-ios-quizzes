@@ -48,3 +48,17 @@ export default tseslint.config({
   },
 })
 ```
+# Accessing API Endpoints
+In order to access the API and make API calls to retrieve data, some steps need to be taken.
+First you want to activate a virtual environment for python through source .../.../swift-ios-quizzes/venv-fastapi/bin/activate
+Once you're in the virtual environment, install the dependencies
+- pip install "fastapi[standard]"
+- pip install "uvicorn[standard]"
+
+It's also common practice to update your pip, so run 
+pip install --upgrade pip or whatever the command is to make sure pip is up to date
+
+Once you're in the virtual environment, run the server with
+ - uvicorn backed.app.main:app --reload
+Once the server is running you can make API calls at the address it shows
+An example API call is using fetch to request data at http://127.0.0.1:8000/quizzes to retrieve quizzes. This is mock data for now. Not integrated with database.
