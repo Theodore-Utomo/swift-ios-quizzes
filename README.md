@@ -60,5 +60,6 @@ pip install --upgrade pip or whatever the command is to make sure pip is up to d
 
 Once you're in the virtual environment, run the server with
  - uvicorn backed.app.main:app --reload
+
 Once the server is running you can make API calls at the address it shows
 An example API call is using fetch to request data at http://127.0.0.1:8000/quizzes to retrieve quizzes. This is mock data for now. Not integrated with database.
