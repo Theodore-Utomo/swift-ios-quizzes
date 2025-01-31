@@ -38,7 +38,7 @@ Quizzes = [
                     '.swift',
                     '.storyboard'
                 ],
-                'question_answer': 'The Project Navigator Pane'
+                'question_answer': '.xcodeproj'
             },
             {
                 'question_number': 4,
