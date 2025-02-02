@@ -42,7 +42,7 @@ Quizzes = [
             },
             {
                 'question_number': 4,
-                'question_type': 'MCQ_more_than_one',
+                'question_type': 'Multiple_answer',
                 'question_text': 'Which of the following should you NOT do:',
                 'question_options': [
                     'Move or copy your project folder with Xcode open.',
@@ -54,7 +54,7 @@ Quizzes = [
                     'Move or copy your project folder with Xcode open.',
                     'Use the Finder to move project files from their saved locations inside your main project folder.',
                     'Rename project files in the Finder.'
-                    ]
+                ]
             },
             {
                 'question_number': 5,
@@ -105,7 +105,7 @@ Quizzes = [
             },
             {
                 "question_number": 9,
-                "question_type": "MCQ_more_than_one",
+                "question_type": "Multiple_answer",
                 "question_text": "Dot notation can:",
                 "question_options": [
                     "Show modifiers available for a particular view",
@@ -171,7 +171,7 @@ Quizzes = [
         'content': [
             {
                 'question_number': 1,
-                'question_type': 'MCQ_more_than_one',
+                'question_type': 'Multiple_answer',
                 'question_text': 'What does one do when they declare a variable?',
                 'question_options': [
                     'Create the holding space for a type of data',
@@ -219,7 +219,7 @@ Quizzes = [
             },
             {
                 "question_number": 5,
-                "question_type": "MCQ_more_than_one",
+                "question_type": "Multiple_answer",
                 "question_text": "Select all of the answers that are true for the statement shown below: var myString = 'Hi, Developer!'",
                 "question_options": [
                     "the variable is declared",
@@ -244,7 +244,7 @@ Quizzes = [
         'content': [
             {
                 'question_number': 1,
-                'question_type': "MCQ_more_than_one",
+                'question_type': "Multiple_answer",
                 'question_text': 'Which of these statements are true?',
                 'question_options': [
                     'Constants are defined using “var”.',
@@ -404,22 +404,22 @@ Quizzes = [
             },
             {
                 "question_number": 7,
-                "question_type": "MCQ",
+                "question_type": "Short_answer",
                 "question_text": "What is the name of the computing term that refers to combining String values (typically using a plus sign)?",
-                "question_options": [
+                "question_options": [],
+                "question_answer": [
                     "concatenation",
                     "Concatenation",
                     "concatenate",
                     "Concatenate"
-                ],
-                "question_answer": "concatenation"
+                ]
             },
             {
                 "question_number": 8,
-                "question_type": "MCQ",
+                "question_type": "Short_answer",
                 "question_text": "I want to evaluate if a value on the left side of an equation is less than or equal to a value on the right side of the equation. What do I type between these values to return whether the value is true or false?",
-                "question_options": ["<="],
-                "question_answer": "<="
+                "question_options": [],
+                "question_answer": ["<="]
             }
         ]
     }
