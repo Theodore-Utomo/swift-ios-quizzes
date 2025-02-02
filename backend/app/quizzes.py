@@ -422,6 +422,90 @@ Quizzes = [
                 "question_answer": ["<="]
             }
         ]
+    },
+    {
+        'id': 5,
+        'name': 'Quiz Ch. 1.5. SwiftUI Constants, Scope, and the One Button Conditional Challenge (2025)',
+        'content': [
+            {
+                'question_number': 1,
+                'question_type': 'MCQ',
+                'question_text': 'When you enter a value directly into code, such as a String that says "You Are Awesome", this is referred to as:',
+                'question_options': [
+                    'A variable',
+                    'A literal',
+                    'A constant',
+                    'A modifier'
+                ],
+                'question_answer': 'A literal'
+            },
+            {
+                'question_number': 2,
+                'question_type': 'MCQ',
+                'question_text': 'Which of these statements are true?',
+                'question_options': [
+                    'Constants are defined using “var”',
+                    'Constants are only used for numerical types.',
+                    'Constants are immutable once defined.',
+                    'Constants slow down your code'
+                ],
+                'question_answer': 'Constants are immutable once defined.'
+            },
+            {
+                'question_number': 3,
+                'question_type': 'MCQ',
+                'question_text': "One equals sign is used to evaluate equality in Swift.",
+                'question_options': [
+                    'True',
+                    'False'
+                ],
+                'question_answer': 'False'
+            },
+            {
+                'question_number': 4,
+                'question_type': 'MCQ',
+                'question_text': f'I\'ve been coding all day, and copying and pasting parts of my code to different locations, and I\'ve noticed that the indentation on my code is off. My code still works, but it looks sloppy. I would like to fix the indentation of my SwiftUI code. What are the two keyboard shortcuts that I type, in succession, to automatically fix the indentation of my code?',
+                'question_options': [
+                    'Command A then Control I',
+                    'Option I then Command A',
+                    'Command I then Command A',
+                    'Control A then Control I',
+                    'Control I then Command A'
+                ],
+                'question_answer': 'Command A then Control I' 
+            },
+            {
+                'question_number': 5,
+                'question_type': 'MCQ',
+                'question_text': "I've entered the code below, but I'm not seeing an Image in the Preview. I expect to see a Swift. What's wrong with my code?\n\nstruct ContentView: View {\n    @State private var imageName = \"Swift\"\n    var body: some View {\n    VStack {\n    Image(SystemName: imageName)\n    }\n    .padding()\n    }\n}\n\nI need to add a modifier to set the size of the Image\n\nI need to set a modifier to give the image a color\n\nI need to initialize my imageString variable to a valid name for a SwiftUI image",
+                "question_options": [
+                    "I need to add a modifier to set the size of the Image",
+                    "I need to set a modifier to give the image a color",
+                    "I need to initialize my imageString variable to a valid name for a SwiftUI image",
+                ],
+                "question_answer": "I need to initialize my imageString variable to a valid name for a SwiftUI image"
+            },
+            {
+                'question_number': 6,
+                'question_type': "Multiple_answer",
+                'question_text': "Select the statements below which are true about the following code: \n struct ContentView: View {\n    let name = \"Prince\"\n    @State private var textString = \"\"\n    var body: some View {\n    VStack {\n    Text(textString)\n    Button(\"What do you think of \\\\name?\") {\n    let personFact = \"Funky\"\n    textString = \"I think that \\\\name) is \\\\personFact)\"\n    }\n    }\n}",
+                'question_options': [
+                    'The code will not run. It contains at least one error.',
+                    'When the code runs, it will start with nothing showing in the Text View',
+                    'When the button is clicked, the Text View will read: "I think that is Funky"',
+                    'When the button is clicked, the Text view will read: "I think that Prince is Funky"',
+                    'name has scope within the ContentView curly braces.',
+                    'textString has scope within the ContentView curly braces.',
+                    'personFact has scope within the ContentView curly braces.'
+                ],
+                'question_answer': [
+                    'When the code runs, it will start with nothing showing in the Text View',
+                    'When the button is clicked, the Text view will read: "I think that Prince is Funky"',
+                    'name has scope within the ContentView curly braces.',
+                    'textString has scope within the ContentView curly braces.'
+                ]
+            }
+        ]
     }
 ]
 
