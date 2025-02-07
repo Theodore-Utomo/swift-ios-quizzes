@@ -1,5 +1,5 @@
-nav {
-    background-color: #e63e3e;
+.navbar {
+    background-color: #000000;
     flex-wrap: wrap;
     padding: 20px;
     width: 100%;
@@ -9,6 +9,8 @@ nav {
   nav ul {
     display: flex;
     list-style-type: none;
+    padding: 10px;
+    margin: 5px;
   }
 
   nav ul a {

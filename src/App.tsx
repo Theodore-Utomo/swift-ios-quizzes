@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import QuizList from "./components/QuizList";
 import QuizPage from "./components/QuizPage";
 import Navbar from "./components/Navbar";
+import Home from "./components/Home";
+import Profile from "./components/Profile";
 
 interface Question {
   question_number: number;
@@ -57,34 +59,14 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/quizzes" element={<QuizList quizzes={quizzes} />} />
         <Route path="/quizzes/:id" element={<QuizPage />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );
 }
-
-fetch("http://127.0.0.1:8000/quizzes")
-  .then((response) => {
-    // Check if the response was successful
-    if (!response.ok) {
-      throw new Error(`Network response was not ok: ${response.status}`);
-    }
-
-    // Access the status code
-    console.log("Response status:", response.status);
-
-    // Do something with the response data
-    return response.json();
-  })
-  .then((data) => {
-    // Process the data
-    console.log(data);
-  })
-  .catch((error) => {
-    // Handle errors
-    console.error("Fetch error:", error);
-  });
 
 fetch("http://127.0.0.1:8000/quizzes")
   .then((response) => {
