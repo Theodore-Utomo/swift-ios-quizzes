@@ -65,3 +65,6 @@ Once you're in the virtual environment, run the server with
 
 Once the server is running you can make API calls at the address it shows
 An example API call is using fetch to request data at http://127.0.0.1:8000/quizzes to retrieve quizzes. This is mock data for now. Not integrated with database.
+
+#NEW UPDATES
+The user login is connected to Theo's personal Google Cloud Firebase account. The SECRET_KEY and GOOGLE_APPLICATION_CREDENTIALS are stored in an .env file. 
