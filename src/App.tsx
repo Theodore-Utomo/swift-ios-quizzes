@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import QuizList from './components/QuizList';
 import QuizPage from './components/QuizPage';
 import Navbar from './components/Navbar';
+import Login from './components/Login';
+import Register from './components/Register';
 
 interface Question {
   question_number: number;
@@ -23,24 +25,35 @@ function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch quiz data from the API
-  useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/quizzes');
-        if (!response.ok) {
-          throw new Error('Failed to fetch quizzes');
-        }
-        const data: Quiz[] = await response.json();
-        setQuizzes(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const isLoggedIn = (): boolean => {
+    return !!localStorage.getItem('token'); // Check if the token exists in localStorage
+  };
 
-    fetchQuizzes();
+  const fetchQuizzes = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/quizzes', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`, // Send token with request
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch quizzes');
+      }
+      const data: Quiz[] = await response.json();
+      setQuizzes(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isLoggedIn()) {
+      fetchQuizzes();
+    } else {
+      setLoading(false); // Stop loading if the user is not logged in
+    }
   }, []);
 
   if (loading) {
@@ -53,11 +66,22 @@ function App() {
 
   return (
     <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/quizzes" element={<QuizList quizzes={quizzes} />} />
-        <Route path="/quizzes/:id" element={<QuizPage />} />
-      </Routes>
+      {isLoggedIn() ? (
+        <>
+          <Navbar />
+          <Routes>
+            <Route path="/quizzes" element={<QuizList quizzes={quizzes} />} />
+            <Route path="/quizzes/:id" element={<QuizPage />} />
+            <Route path="*" element={<Navigate to="/quizzes" />} />
+          </Routes>
+        </>
+      ) : (
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+      )}
     </Router>
   );
 }

@@ -1,10 +1,23 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.schemas.quiz import Quiz
 import backend.app.quizzes
+from google.cloud import firestore
+from backend.app.schemas.users import User, Token, UserLogin
+from backend.app.auth import create_access_token, get_password_hash, verify_password
+from backend.app.database import db
+from dotenv import load_dotenv
+import os
 
+# Load environment variables from .env
+load_dotenv()
+
+# Access the secret key and service account path
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 app = FastAPI() ## Instantiates an app object that lets you make API Calls
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],  # Vite development server
@@ -12,6 +25,39 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.post("/register/")
+async def register_user(user: User):
+    user_ref = db.collection("users").document(user.username)
+
+    # Check if the username already exists
+    if user_ref.get().exists:
+        raise HTTPException(status_code=400, detail="Username already registered")
+
+    # Store user with hashed password and role
+    hashed_password = get_password_hash(user.password)
+    user_ref.set({
+        "username": user.username,
+        "password": hashed_password,
+        "role": user.role
+    })
+    return {"message": "User registered successfully"}
+
+@app.post("/login/", response_model=Token)
+async def login(user: UserLogin):
+    # Fetch user data from Firestore
+    user_ref = db.collection("users").document(user.username).get()
+    if not user_ref.exists:
+        raise HTTPException(status_code=400, detail="User doesn't exist or password")
+
+    user_data = user_ref.to_dict()
+    # Verify password
+    if not verify_password(user.password, user_data["password"]):
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+    # Create a token with the user's role
+    access_token = create_access_token(data={"sub": user.username, "role": user_data["role"]})
+    return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/quizzes")
 async def quiz() -> list[Quiz]:
@@ -27,3 +73,4 @@ async def quiz_by_id(id: int) -> Quiz:
     
     # Return the quiz (id - 1 because list indices start at 0)
     return quizzes[id - 1]
+
