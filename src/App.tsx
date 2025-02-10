@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import QuizList from './components/QuizList';
 import QuizPage from './components/QuizPage';
 import Navbar from './components/Navbar';
@@ -22,23 +22,23 @@ interface Quiz {
 
 function App() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-  const isLoggedIn = (): boolean => {
-    return !!localStorage.getItem('token'); // Check if the token exists in localStorage
-  };
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!localStorage.getItem('token'));
 
   const fetchQuizzes = async () => {
+    setLoading(true);
     try {
       const response = await fetch('http://127.0.0.1:8000/quizzes', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`, // Send token with request
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
+
       if (!response.ok) {
         throw new Error('Failed to fetch quizzes');
       }
+
       const data: Quiz[] = await response.json();
       setQuizzes(data);
     } catch (err) {
@@ -49,12 +49,15 @@ function App() {
   };
 
   useEffect(() => {
-    if (isLoggedIn()) {
+    if (isLoggedIn) {
       fetchQuizzes();
-    } else {
-      setLoading(false); // Stop loading if the user is not logged in
     }
-  }, []);
+  }, [isLoggedIn]);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+  };
 
   if (loading) {
     return <p>Loading quizzes...</p>;
@@ -64,11 +67,15 @@ function App() {
     return <p style={{ color: 'red' }}>Error: {error}</p>;
   }
 
+  const handleLogin = (token: string) => {
+    setIsLoggedIn(true);
+  };
+
   return (
     <Router>
-      {isLoggedIn() ? (
+      {isLoggedIn ? (
         <>
-          <Navbar />
+          <Navbar onSignOut={handleSignOut} />
           <Routes>
             <Route path="/quizzes" element={<QuizList quizzes={quizzes} />} />
             <Route path="/quizzes/:id" element={<QuizPage />} />
@@ -77,7 +84,7 @@ function App() {
         </>
       ) : (
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/register" element={<Register />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>

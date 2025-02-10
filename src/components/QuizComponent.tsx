@@ -1,19 +1,6 @@
 import React, { useState } from 'react';
-import "./../styles/QuizComponent.css";
-
-interface Question {
-    question_number: number;
-    question_type: 'MCQ' | 'Multiple_answer' | 'Short_answer';
-    question_text: string;
-    question_options: string[];
-    question_answer: string | string[];
-}
-
-interface Quiz {
-    id: number;
-    name: string;
-    content: Question[];
-}
+import './../styles/QuizComponent.css';
+import { Quiz } from '../types';
 
 const QuizComponent: React.FC<{ quiz: Quiz }> = ({ quiz }) => {
     const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: string | string[] }>({});

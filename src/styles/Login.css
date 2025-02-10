@@ -1,0 +1,78 @@
+
+.login-container {
+    background-color: #ffffff;
+    padding: 20px 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+}
+
+/* Login title */
+h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Input hover and focus effects */
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #0077cc;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 119, 204, 0.5);
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #005fa3;
+}
+
+p {
+    color: #666;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* Error or success message */
+.message {
+    font-size: 14px;
+    color: red;
+    margin-top: 10px;
+}
+
+.success {
+    color: green;
+}
+
+a {
+    color: #0077cc;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}

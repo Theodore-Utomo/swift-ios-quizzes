@@ -68,5 +68,3 @@ An example API call is using fetch to request data at http://127.0.0.1:8000/quiz
 
 #NEW UPDATES
 The user login is connected to Theo's personal Google Cloud Firebase account. The SECRET_KEY and GOOGLE_APPLICATION_CREDENTIALS are stored in an .env file. 
-
-TODO: Fix login so that when a user logs in, it automatically takes them to the main page.

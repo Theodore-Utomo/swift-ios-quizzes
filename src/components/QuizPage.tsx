@@ -1,20 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import QuizComponent from '../components/QuizComponent';
-
-interface Question {
-    question_number: number;
-    question_type: 'MCQ' | 'MCQ_more_than_one' | 'Short_answer';
-    question_text: string;
-    question_options: string[];
-    question_answer: string | string[];
-}
-
-interface Quiz {
-    id: number;
-    name: string;
-    content: Question[];
-}
+import { Quiz } from '../types';
 
 const QuizPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();

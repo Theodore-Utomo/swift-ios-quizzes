@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import axios from "axios";
+import './../styles/Login.css';
+import {TokenResponse , LoginProps} from "../types";
 
-interface TokenResponse {
-    access_token: string;
-    token_type: string;
-}
 
-const Login: React.FC = () => {
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
@@ -24,22 +22,20 @@ const Login: React.FC = () => {
             const token = response.data.access_token;
             localStorage.setItem("token", token);
 
-            const decodedToken = JSON.parse(atob(token.split(".")[1]));
-            const role = decodedToken.role;
-
+            onLogin(token);
             setMessage("Login successful!");
-            
-            console.log(role)
-            // Navigate based on the user's role
             navigate("/quizzes");
-           
         } catch (error) {
-            setMessage("Login failed: " + (axios.isAxiosError(error) ? error.response?.data.detail : "An unexpected error occurred"));
+            if (axios.isAxiosError(error)) {
+                setMessage("Login failed: " + (error.response?.data.detail || "Unknown error"));
+            } else {
+                setMessage("Login failed: An unexpected error occurred");
+            }
         }
     };
 
     return (
-        <div>
+        <div className="login-container">
             <h2>Login</h2>
             <input
                 type="text"

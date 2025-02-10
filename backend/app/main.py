@@ -7,7 +7,9 @@ from backend.app.schemas.users import User, Token, UserLogin
 from backend.app.auth import create_access_token, get_password_hash, verify_password
 from backend.app.database import db
 from dotenv import load_dotenv
+from firebase_admin import auth
 import os
+
 
 # Load environment variables from .env
 load_dotenv()
@@ -58,6 +60,28 @@ async def login(user: UserLogin):
     # Create a token with the user's role
     access_token = create_access_token(data={"sub": user.username, "role": user_data["role"]})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+def get_user_uid(token: str) -> str:
+    try:
+        decoded_token = auth.verify_id_token(token)
+        return decoded_token['uid']
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+# Sign-out route
+@app.post("/sign-out/")
+async def sign_out(token: str):
+    try:
+        # Verify the token and get the user UID
+        user_uid = get_user_uid(token)
+
+        # Revoke refresh tokens for the user
+        auth.revoke_refresh_tokens(user_uid)
+
+        return {"message": "Successfully signed out"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error signing out: {str(e)}")
 
 @app.get("/quizzes")
 async def quiz() -> list[Quiz]:

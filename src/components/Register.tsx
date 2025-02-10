@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import axios from "axios";
+import './../styles/Register.css';
 
 const Register: React.FC = () => {
     const [username, setUsername] = useState("");
@@ -14,14 +15,18 @@ const Register: React.FC = () => {
         try {
             await api.post("/register/", { username, password, role });
             setMessage("Registration successful! You can now log in.");
-            navigate("/login"); // Redirect to login after successful registration
+            navigate("/login");
         } catch (error) {
-            setMessage("Registration failed: " + (axios.isAxiosError(error) ? error.response?.data.detail : "An unexpected error occurred"));
+            if (axios.isAxiosError(error)) {
+                setMessage("Registration failed: " + (error.response?.data.detail || "Unknown error"));
+            } else {
+                setMessage("Registration failed: An unexpected error occurred");
+            }
         }
     };
 
     return (
-        <div>
+        <div className="register-container">
             <h2>Register</h2>
             <input
                 type="text"
@@ -42,7 +47,6 @@ const Register: React.FC = () => {
             <button onClick={handleRegister}>Register</button>
             <p>{message}</p>
 
-            {/* Link to the login page */}
             <p>
                 Already have an account? <Link to="/login">Log in here</Link>.
             </p>
