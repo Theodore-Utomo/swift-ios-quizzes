@@ -4,10 +4,20 @@ export interface Question {
     question_text: string;
     question_options: string[];
     question_answer: string | string[];
+    question_hint: string;
 }
 
 export interface Quiz {
     id: number;
     name: string;
     content: Question[];
+}
+
+export interface TokenResponse {
+    access_token: string;
+    token_type: string;
+}
+
+export interface LoginProps {
+    onLogin: (token: string) => void;
 }

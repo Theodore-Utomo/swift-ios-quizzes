@@ -5,20 +5,8 @@ import QuizPage from './components/QuizPage';
 import Navbar from './components/Navbar';
 import Login from './components/Login';
 import Register from './components/Register';
+import { Quiz} from './types'
 
-interface Question {
-  question_number: number;
-  question_type: 'MCQ' | 'MCQ_more_than_one' | 'Short_answer';
-  question_text: string;
-  question_options: string[];
-  question_answer: string | string[];
-}
-
-interface Quiz {
-  id: number;
-  name: string;
-  content: Question[];
-}
 
 function App() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);

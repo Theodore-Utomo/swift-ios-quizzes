@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.schemas.quiz import Quiz
-import backend.app.quizzes
+#import backend.app.quizzes
 from google.cloud import firestore
 from backend.app.schemas.users import User, Token, UserLogin
 from backend.app.auth import create_access_token, get_password_hash, verify_password
@@ -83,9 +83,30 @@ async def sign_out(token: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error signing out: {str(e)}")
 
+def get_quizzes() -> list[Quiz]:
+    """
+    Retrieve all quizzes from the Firestore database.
+    
+    Returns:
+        A list of Quiz objects.
+    """
+    try:
+        # Stream all documents from the "quizzes" collection.
+        quiz_docs = db.collection("quizzes").stream()
+        quizzes = []
+        # Convert each document to a Quiz model.
+        for doc in quiz_docs:
+            quiz_data = doc.to_dict()
+            # Optionally, ensure that the document's data matches the Quiz schema.
+            quizzes.append(Quiz(**quiz_data))
+        return quizzes
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving quizzes: {str(e)}")
+
 @app.get("/quizzes")
 async def quiz() -> list[Quiz]:
-    return backend.app.quizzes.get_quizzes()
+    return get_quizzes()
+
 
 @app.get("/quizzes/{id}")
 async def quiz_by_id(id: int) -> Quiz:
@@ -97,4 +118,22 @@ async def quiz_by_id(id: int) -> Quiz:
     
     # Return the quiz (id - 1 because list indices start at 0)
     return quizzes[id - 1]
+
+@app.post("/quizzes", response_model=Quiz)
+async def add_quiz(quiz: Quiz):
+    """
+    BEWARE THIS FUNCTION IS UNTESTED
+    """
+    
+    # Create a reference to a Firestore document for the quiz using its id as the document ID.
+    quiz_ref = db.collection("quizzes").document(str(quiz.id))
+    
+    # Check if a quiz with this ID already exists.
+    if quiz_ref.get().exists:
+        raise HTTPException(status_code=400, detail="Quiz already exists")
+    
+    # Convert the Quiz object to a dictionary and store it in Firestore.
+    quiz_ref.set(quiz.dict())
+    
+    return quiz
 
