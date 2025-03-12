@@ -4,7 +4,6 @@ export interface Question {
     question_text: string;
     question_options: string[];
     question_answer: string | string[];
-    question_hint: string;
 }
 
 export interface Quiz {

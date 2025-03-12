@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.schemas.quiz import Quiz
-#import backend.app.quizzes
 from google.cloud import firestore
 from backend.app.schemas.users import User, Token, UserLogin
 from backend.app.auth import create_access_token, get_password_hash, verify_password
@@ -110,7 +109,7 @@ async def quiz() -> list[Quiz]:
 
 @app.get("/quizzes/{id}")
 async def quiz_by_id(id: int) -> Quiz:
-    quizzes = backend.app.quizzes.get_quizzes()
+    quizzes = get_quizzes()
     
     # Check if the id is within the valid range
     if id < 1 or id > len(quizzes):
