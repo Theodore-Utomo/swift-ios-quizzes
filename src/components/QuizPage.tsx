@@ -4,16 +4,15 @@ import QuizComponent from '../components/QuizComponent';
 import { Quiz } from '../types';
 
 const QuizPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const { classId, quizId } = useParams<{ classId: string; quizId: string }>();
     const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Fetch the specific quiz data
     useEffect(() => {
         const fetchQuiz = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/quizzes/${id}`);
+                const response = await fetch(`http://127.0.0.1:8000/classes/${classId}/quizzes/${quizId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch quiz');
                 }
@@ -27,19 +26,11 @@ const QuizPage: React.FC = () => {
         };
 
         fetchQuiz();
-    }, [id]);
+    }, [classId, quizId]);
 
-    if (loading) {
-        return <p>Loading quiz...</p>;
-    }
-
-    if (error) {
-        return <p style={{ color: 'red' }}>Error: {error}</p>;
-    }
-
-    if (!quiz) {
-        return <p>Quiz not found.</p>;
-    }
+    if (loading) return <p>Loading quiz...</p>;
+    if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
+    if (!quiz) return <p>Quiz not found.</p>;
 
     return (
         <div>

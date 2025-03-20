@@ -1,47 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import InstructorPanel from './components/Instructor';
-import QuizList from './components/QuizList';
-import QuizPage from './components/QuizPage';
+import InstructorPanel from './components/InstructorPanel';
 import Navbar from './components/Navbar';
 import Login from './components/Login';
 import Register from './components/Register';
-import { Quiz} from './types'
-
+import HomePage from './components/HomePage';
+import ClassDetails from './components/ClassDetails';
+import QuizPage from './components/QuizPage';
 
 function App() {
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!localStorage.getItem('token'));
-
-  const fetchQuizzes = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('http://127.0.0.1:8000/quizzes', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch quizzes');
-      }
-
-      const data: Quiz[] = await response.json();
-      setQuizzes(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchQuizzes();
-    }
-  }, [isLoggedIn]);
 
   const handleSignOut = () => {
     localStorage.removeItem('token');
@@ -57,6 +27,7 @@ function App() {
   }
 
   const handleLogin = (token: string) => {
+    localStorage.setItem('token', token); // Ensure token is saved
     setIsLoggedIn(true);
   };
 
@@ -66,10 +37,13 @@ function App() {
         <>
           <Navbar onSignOut={handleSignOut} />
           <Routes>
-            <Route path="/instructor-panel" element={<InstructorPanel/>} />
-            <Route path="/quizzes" element={<QuizList quizzes={quizzes} />} />
-            <Route path="/quizzes/:id" element={<QuizPage />} />
-            <Route path="*" element={<Navigate to="/quizzes" />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/instructor-panel" element={<InstructorPanel />} />
+            <Route path="/class/:classId" element={<ClassDetails />} />
+            {/* New route for listing all quizzes */}
+            {/* Existing route for taking a quiz */}
+            <Route path="/classes/:classId/quizzes/:quizId" element={<QuizPage />} />
+            <Route path="*" element={<Navigate to="/home" />} />
           </Routes>
         </>
       ) : (

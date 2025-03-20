@@ -1,16 +1,18 @@
 export interface Question {
     question_number: number;
-    question_type: 'MCQ' | 'Multiple_answer' | 'Short_answer';
+    question_type: "MCQ" | "Multiple_answer" | "Short_answer";
     question_text: string;
     question_options: string[];
     question_answer: string | string[];
-}
-
-export interface Quiz {
-    id: number;
+    question_hint: string;
+  }
+  
+  export interface Quiz {
+    id: string;
     name: string;
     content: Question[];
-}
+  }
+  
 
 export interface TokenResponse {
     access_token: string;

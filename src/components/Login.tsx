@@ -24,7 +24,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
             onLogin(token);
             setMessage("Login successful!");
-            navigate("/quizzes");
+            navigate("/home");
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 setMessage("Login failed: " + (error.response?.data.detail || "Unknown error"));

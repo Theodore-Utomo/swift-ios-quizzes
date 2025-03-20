@@ -27,13 +27,7 @@ export default function Navbar({ onSignOut }: { onSignOut: () => void }) {
         <nav className="navbar">
             <ul className="nav-list">
                 <li className="nav-item">
-                    <Link to="/">Home</Link>
-                </li>
-                <li className="nav-item">
-                    <Link to="/quizzes">Quizzes</Link>
-                </li>
-                <li className="nav-item">
-                    <Link to="/profile">Profile</Link>
+                    <Link to="/home">Home</Link>
                 </li>
                 <li className="nav-item">
                     <button onClick={onSignOut} className="sign-out-button">

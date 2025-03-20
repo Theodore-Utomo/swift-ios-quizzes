@@ -89,6 +89,10 @@ const QuizComponent: React.FC<{ quiz: Quiz }> = ({ quiz }) => {
                             {results[question.question_number] ? 'Correct!' : 'Incorrect!'}
                         </p>
                     )}
+                    {/* Show the hint once the quiz is submitted */}
+                    {score !== null && question.question_hint && (
+                        <p className="hint-text">Hint: {question.question_hint}</p>
+                    )}
                 </div>
             ))}
             <button className="submit-button" onClick={checkAnswers}>Submit Answers</button>
