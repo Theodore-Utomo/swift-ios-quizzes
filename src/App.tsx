@@ -7,10 +7,11 @@ import Register from './components/Register';
 import HomePage from './components/HomePage';
 import ClassDetails from './components/ClassDetails';
 import QuizPage from './components/QuizPage';
+import ProgressPage from './components/ProgressPage';
 
 function App() {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading] = useState<boolean>(false);
+  const [error] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!localStorage.getItem('token'));
 
   const handleSignOut = () => {
@@ -40,9 +41,8 @@ function App() {
             <Route path="/home" element={<HomePage />} />
             <Route path="/instructor-panel" element={<InstructorPanel />} />
             <Route path="/class/:classId" element={<ClassDetails />} />
-            {/* New route for listing all quizzes */}
-            {/* Existing route for taking a quiz */}
             <Route path="/classes/:classId/quizzes/:quizId" element={<QuizPage />} />
+            <Route path="/progress" element={<ProgressPage />} />
             <Route path="*" element={<Navigate to="/home" />} />
           </Routes>
         </>

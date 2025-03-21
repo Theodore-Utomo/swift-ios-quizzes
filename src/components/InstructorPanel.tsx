@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ClassList from "./ClassList";
 import QuizManager from "./QuizManager";
+import "./../styles/InstructorPanel.css";
 
 const InstructorPanel: React.FC = () => {
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);

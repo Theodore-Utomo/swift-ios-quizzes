@@ -3,10 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app.schemas.quiz import Quiz
 from backend.app.schemas.users import User, Token, UserLogin
 from backend.app.schemas.classes import ClassCreate, ClassOut
+from backend.app.schemas.quiz_progress import QuizProgress 
 from backend.app.auth import create_access_token, get_password_hash, verify_password
 from backend.app.database import db
 from dotenv import load_dotenv
 from firebase_admin import auth
+from datetime import datetime
+from typing import List
 import os
 
 # Load environment variables from .env
@@ -150,7 +153,17 @@ async def update_quiz(class_id: str, quiz_id: str, quiz: Quiz):
     quiz_doc = quizzes_ref(class_id).document(quiz_id)
     if not quiz_doc.get().exists:
         raise HTTPException(status_code=404, detail="Quiz not found")
+    
+    # Update the quiz document.
     quiz_doc.set(quiz.dict())
+    
+    # Update the quiz progress entries with the new quiz name, if they exist.
+    users = db.collection("users").stream()
+    for user in users:
+         progress_ref = user.reference.collection("quizProgress").document(quiz_id)
+         if progress_ref.get().exists:
+              progress_ref.update({"quiz_name": quiz.name})
+    
     return quiz
 
 @app.delete("/classes/{class_id}/quizzes/{quiz_id}", status_code=204)
@@ -158,7 +171,17 @@ async def delete_quiz(class_id: str, quiz_id: str):
     quiz_doc = quizzes_ref(class_id).document(quiz_id)
     if not quiz_doc.get().exists:
         raise HTTPException(status_code=404, detail="Quiz not found")
+    
+    # Delete the quiz document.
     quiz_doc.delete()
+    
+    # Delete all quiz progress for this quiz from every user.
+    users = db.collection("users").stream()
+    for user in users:
+         progress_ref = user.reference.collection("quizProgress").document(quiz_id)
+         if progress_ref.get().exists:
+              progress_ref.delete()
+    
     return
 
 @app.get("/classes/{class_id}/quizzes/{quiz_id}", response_model=Quiz)
@@ -180,3 +203,53 @@ async def get_all_quizzes():
         class_id = cls.id
         quizzes.extend([Quiz(**doc.to_dict()) for doc in db.collection("classes").document(class_id).collection("quizzes").stream()])
     return quizzes
+
+# ---------------------
+# Quiz Progress Endpoints: CRUD Operations for Users Saving Progress on Quizzes
+# ---------------------
+
+@app.get("/users/{username}/quizProgress/{quiz_id}", response_model=QuizProgress)
+async def get_quiz_progress(username: str, quiz_id: str):
+    user_ref = db.collection("users").document(username)
+    if not user_ref.get().exists:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    progress_ref = user_ref.collection("quizProgress").document(quiz_id)
+    progress_doc = progress_ref.get()
+    if not progress_doc.exists:
+        raise HTTPException(status_code=404, detail="Quiz progress not found")
+    
+    return progress_doc.to_dict()
+
+@app.post("/users/{username}/quizProgress/{quiz_id}", response_model=QuizProgress, status_code=201)
+async def upload_quiz_progress(username: str, quiz_id: str, progress: QuizProgress):
+    # Get the user document by username.
+    user_ref = db.collection("users").document(username)
+    if not user_ref.get().exists:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Reference the quiz progress document under the user's quizProgress subcollection.
+    progress_ref = user_ref.collection("quizProgress").document(quiz_id)
+    
+    # Set timestamps: if 'started_at' isn’t provided, use the current UTC time.
+    now = datetime.utcnow()
+    progress_data = progress.dict()
+    if not progress_data.get("started_at"):
+        progress_data["started_at"] = now
+    progress_data["updated_at"] = now
+    # Also, save the quiz_id inside the document.
+    progress_data["quiz_id"] = quiz_id
+    
+    # Save the progress data to Firestore using merge so that you update existing entries.
+    progress_ref.set(progress_data, merge=True)
+    return progress_data
+
+@app.get("/users/{username}/quizProgress", response_model=List[QuizProgress])
+async def list_quiz_progress(username: str):
+    user_ref = db.collection("users").document(username)
+    if not user_ref.get().exists:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    progress_docs = user_ref.collection("quizProgress").stream()
+    # Add the document id (quiz_id) to the returned data.
+    return [QuizProgress(**{**doc.to_dict(), "quiz_id": doc.id}) for doc in progress_docs]

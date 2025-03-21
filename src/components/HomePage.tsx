@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./../styles/HomePage.css";
 
 interface ClassOut {
   class_id: string;
@@ -31,7 +32,6 @@ const HomePage: React.FC = () => {
   }, []);
 
   const handleClassClick = (classId: string) => {
-    // Navigate to the class's quiz page (e.g. /class/<classId>)
     navigate(`/class/${classId}`);
   };
 
@@ -39,15 +39,11 @@ const HomePage: React.FC = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="homepage-container">
       <h1>Available Courses</h1>
       <ul>
         {classes.map((cls) => (
-          <li
-            key={cls.class_id}
-            style={{ cursor: "pointer", marginBottom: "10px", color: "blue" }}
-            onClick={() => handleClassClick(cls.class_id)}
-          >
+          <li key={cls.class_id} onClick={() => handleClassClick(cls.class_id)}>
             {cls.name}
           </li>
         ))}
