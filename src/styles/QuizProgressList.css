@@ -1,0 +1,40 @@
+.quiz-progress-list {
+    background: #1e1e1e;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 800px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .quiz-progress-list h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #00eaff;
+  }
+  
+  .quiz-progress-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  
+  .quiz-progress-list th,
+  .quiz-progress-list td {
+    padding: 0.8rem;
+    border: 1px solid #333;
+    text-align: center;
+  }
+  
+  .quiz-progress-list th {
+    background: #2a2a2a;
+    color: #00eaff;
+  }
+  
+  .quiz-progress-list td {
+    background: #2a2a2a;
+  }
+  

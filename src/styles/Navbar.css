@@ -1,4 +1,5 @@
 .navbar {
+<<<<<<< HEAD
     background-color: #000000;
     flex-wrap: wrap;
     padding: 20px;
@@ -12,9 +13,37 @@
     padding: 10px;
     margin: 5px;
   }
+=======
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+>>>>>>> google-cloud-firebase-integration
 
-  nav ul a {
-    color: #ffffff;
-    text-decoration: none;
-    padding: 10px;
-  }
+.nav-list {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item a,
+.nav-item button {
+  color: #ffffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  text-decoration: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.nav-item a:hover,
+.nav-item button:hover {
+  color: #00eaff;
+}

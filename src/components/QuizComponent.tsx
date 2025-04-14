@@ -1,25 +1,17 @@
 import React, { useState } from 'react';
 import "./../styles/QuizComponent.css";
+import { Quiz } from '../types';
 
-interface Question {
-    question_number: number;
-    question_type: 'MCQ' | 'Multiple_answer' | 'Short_answer';
-    question_text: string;
-    question_options: string[];
-    question_answer: string | string[];
+interface QuizComponentProps {
+  quiz: Quiz;
+  username: string;
 }
 
-interface Quiz {
-    id: number;
-    name: string;
-    content: Question[];
-}
-
-const QuizComponent: React.FC<{ quiz: Quiz }> = ({ quiz }) => {
+const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, username }) => {
     const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: string | string[] }>({});
     const [results, setResults] = useState<{ [key: number]: boolean }>({});
     const [score, setScore] = useState<number | null>(null);
-
+    
     const handleAnswerSelect = (questionNumber: number, answer: string | string[]) => {
         setSelectedAnswers((prev) => ({
             ...prev,
@@ -27,14 +19,15 @@ const QuizComponent: React.FC<{ quiz: Quiz }> = ({ quiz }) => {
         }));
     };
 
-    const checkAnswers = () => {
+    const handleSubmit = async () => {
+        // Check the answers and compute score
         let correctCount = 0;
         const newResults: { [key: number]: boolean } = {};
-
+    
         quiz.content.forEach((question) => {
             const userAnswer = selectedAnswers[question.question_number];
             const correctAnswer = question.question_answer;
-
+    
             if (question.question_type === 'MCQ') {
                 newResults[question.question_number] = userAnswer === correctAnswer;
             } else if (question.question_type === 'Multiple_answer') {
@@ -49,16 +42,41 @@ const QuizComponent: React.FC<{ quiz: Quiz }> = ({ quiz }) => {
                         (correct) => correct.toLowerCase() === userAnswer.toLowerCase()
                     );
             }
-
+    
             if (newResults[question.question_number]) {
                 correctCount++;
             }
         });
-
+    
         setResults(newResults);
         setScore(correctCount);
+    
+        // Save progress with additional fields: score, total_questions, and quiz_name
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/users/${username}/quizProgress/${quiz.id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    current_question: 1, // or adjust as needed
+                    answers: selectedAnswers,
+                    status: "completed",
+                    score: correctCount,
+                    total_questions: quiz.content.length,
+                    quiz_name: quiz.name   // <-- sending quiz name
+                })
+            });
+            if (!response.ok) {
+                throw new Error("Failed to save progress");
+            }
+            const data = await response.json();
+            console.log("Progress saved", data);
+        } catch (error) {
+            console.error("Error saving progress", error);
+        }
     };
-
+    
     return (
         <div className="quiz-container">
             <h1 className="quiz-title">{quiz.name}</h1>
@@ -102,10 +120,14 @@ const QuizComponent: React.FC<{ quiz: Quiz }> = ({ quiz }) => {
                             {results[question.question_number] ? 'Correct!' : 'Incorrect!'}
                         </p>
                     )}
+                    {score !== null && question.question_hint && (
+                        <p className="hint-text">Hint: {question.question_hint}</p>
+                    )}
                 </div>
             ))}
-            <button className="submit-button" onClick={checkAnswers}>Submit Answers</button>
-
+            <div className="button-container">
+                <button className="submit-button" onClick={handleSubmit}>Submit Answers</button>
+            </div>
             {score !== null && (
                 <div className="score-container">
                     <h2 className="score-text">Your Score: {score} / {quiz.content.length}</h2>

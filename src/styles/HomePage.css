@@ -1,0 +1,40 @@
+.homepage-container {
+    padding: 20px;
+    background: #1e1e1e;
+    border-radius: 10px;
+    margin: 2rem auto;
+    max-width: 800px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+  }
+  
+  .homepage-container h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    color: #00eaff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  
+  .homepage-container ul {
+    list-style: none; /* removes bullet points */
+    padding: 0;
+    margin: 0;
+  }
+  
+  .homepage-container li {
+    cursor: pointer;
+    margin-bottom: 20px;
+    color: #00eaff;
+    font-size: 1.8rem;
+    transition: all 0.3s ease;
+  }
+  
+  .homepage-container li:hover {
+    text-decoration: underline;
+    color: #00ffff;
+    transform: scale(1.05);
+  }
+  
