@@ -1,0 +1,32 @@
+# render.yaml
+services:
+  # ────────────────────────────────────────────────
+  # 1) FastAPI Web Service
+  # ────────────────────────────────────────────────
+  - type: web
+    name: my-quiz-app-backend
+    env: python
+    region: oregon                # pick your nearest region
+    plan: free                    # or hobby-small, starter-1…
+    dir: backend                  # ← points at your FastAPI code
+    buildCommand: |
+      pip install -r requirements.txt
+    startCommand: |
+      # bind to 0.0.0.0 and use PORT if you like:
+      uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+    # optional health check endpoint
+    healthCheckPath: /healthz
+
+  # ────────────────────────────────────────────────
+  # 2) React/TypeScript Static Site
+  # ────────────────────────────────────────────────
+  - type: static
+    name: my-quiz-app-frontend
+    region: oregon
+    plan: free
+    env: node                      # for build/install
+    dir: frontend                  # ← points at your React/TS code
+    buildCommand: |
+      npm install
+      npm run build
+    staticPublishPath: build       # CRA/Vite default output
