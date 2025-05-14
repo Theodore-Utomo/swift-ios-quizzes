@@ -1,11 +1,16 @@
 from google.cloud import firestore
+from google.oauth2 import service_account
 import os
+import json
 from dotenv import load_dotenv
 
 load_dotenv()
-service_account_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-if not service_account_path:
-    raise Exception("Missing requirement")
+raw = os.getenv("FIREBASE_CREDENTIALS")
+if not raw:
+    raise RuntimeError("Missing FIREBASE_CREDENTIALS var")
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_path
-db = firestore.Client()
+info = json.loads(raw)
+
+creds = service_account.Credentials.from_service_account_info(info)
+
+db = firestore.Client(credentials=creds, project=info["project_id"])
