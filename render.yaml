@@ -1,4 +1,3 @@
-# render.yaml
 services:
   # ────────────────────────────────────────────────
   # 1) FastAPI Web Service
@@ -6,7 +5,7 @@ services:
   - type: web
     name: my-quiz-app-backend
     env: python
-    region: oregon                # pick your nearest region
+    region: ohio                # pick your nearest region
     plan: free                    # or hobby-small, starter-1…
     dir: backend                  # ← points at your FastAPI code
     buildCommand: |
@@ -22,7 +21,7 @@ services:
   # ────────────────────────────────────────────────
   - type: static
     name: my-quiz-app-frontend
-    region: oregon
+    region: ohio
     plan: free
     env: node                      # for build/install
     dir: frontend                  # ← points at your React/TS code

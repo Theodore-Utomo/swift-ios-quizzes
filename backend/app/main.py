@@ -23,7 +23,7 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Use specific origins in production
+    allow_origins=["*", "https://my-quiz-app-frontend.onrender.com"],  # Replace later during production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
