@@ -1,11 +1,11 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.schemas.quiz import Quiz
-from backend.app.schemas.users import User, Token, UserLogin
-from backend.app.schemas.classes import ClassCreate, ClassOut
-from backend.app.schemas.quiz_progress import QuizProgress 
-from backend.app.auth import create_access_token, get_password_hash, verify_password
-from backend.app.database import db
+from app.schemas.quiz import Quiz
+from app.schemas.users import User, Token, UserLogin
+from app.schemas.classes import ClassCreate, ClassOut
+from app.schemas.quiz_progress import QuizProgress 
+from app.auth import create_access_token, get_password_hash, verify_password
+from app.database import db
 from dotenv import load_dotenv
 from firebase_admin import auth
 from datetime import datetime
