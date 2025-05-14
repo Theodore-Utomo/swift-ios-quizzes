@@ -53,7 +53,7 @@ const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, username }) => {
     
         // Save progress with additional fields: score, total_questions, and quiz_name
         try {
-            const response = await fetch(`http://127.0.0.1:8000/users/${username}/quizProgress/${quiz.id}`, {
+            const response = await fetch(`https://swift-ios-quizzes-backend.onrender.com/users/${username}/quizProgress/${quiz.id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

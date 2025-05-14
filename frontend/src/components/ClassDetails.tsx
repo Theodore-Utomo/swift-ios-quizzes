@@ -25,7 +25,7 @@ const ClassDetails: React.FC = () => {
     const fetchData = async () => {
       try {
         // Fetch class details to display the class name.
-        const classRes = await fetch(`http://127.0.0.1:8000/classes/${classId}`);
+        const classRes = await fetch(`https://swift-ios-quizzes-backend.onrender.com/classes/${classId}`);
         if (!classRes.ok) {
           throw new Error("Failed to fetch class info");
         }
@@ -33,7 +33,7 @@ const ClassDetails: React.FC = () => {
         setClassInfo(classData);
 
         // Fetch quizzes for the class.
-        const quizzesRes = await fetch(`http://127.0.0.1:8000/classes/${classId}/quizzes/`);
+        const quizzesRes = await fetch(`https://swift-ios-quizzes-backend.onrender.com/classes/${classId}/quizzes/`);
         if (!quizzesRes.ok) {
           throw new Error("Failed to fetch quizzes");
         }

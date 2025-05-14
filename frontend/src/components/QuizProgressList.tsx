@@ -26,7 +26,7 @@ const QuizProgressList: React.FC<QuizProgressListProps> = ({ username }) => {
   useEffect(() => {
     const fetchProgressList = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/users/${username}/quizProgress`);
+        const response = await fetch(`https://swift-ios-quizzes-backend.onrender.com/users/${username}/quizProgress`);
         if (!response.ok) {
           throw new Error('Failed to fetch quiz progress');
         }

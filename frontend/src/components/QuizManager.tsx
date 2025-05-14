@@ -16,7 +16,7 @@ const QuizManager: React.FC<QuizManagerProps> = ({ classId }) => {
 
   const fetchQuizzes = async () => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/classes/${classId}/quizzes/`);
+      const res = await fetch(`https://swift-ios-quizzes-backend.onrender.com/classes/${classId}/quizzes/`);
       if (!res.ok) throw new Error("Failed to fetch quizzes");
       const data = await res.json();
       setQuizzes(data);

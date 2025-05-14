@@ -19,7 +19,7 @@ const ClassList: React.FC<ClassListProps> = ({ onSelectClass, selectedClassId })
   // Fetch classes
   const fetchClasses = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/classes/");
+      const res = await fetch("https://swift-ios-quizzes-backend.onrender.com/classes/");
       if (!res.ok) throw new Error("Failed to fetch classes");
       const data = await res.json();
       setClasses(data);
