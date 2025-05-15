@@ -57,26 +57,4 @@ function App() {
   );
 }
 
-fetch("http://127.0.0.1:8000/quizzes")
-  .then((response) => {
-    // Check if the response was successful
-    if (!response.ok) {
-      throw new Error(`Network response was not ok: ${response.status}`);
-    }
-
-    // Access the status code
-    console.log("Response status:", response.status);
-
-    // Do something with the response data
-    return response.json();
-  })
-  .then((data) => {
-    // Process the data
-    console.log(data);
-  })
-  .catch((error) => {
-    // Handle errors
-    console.error("Fetch error:", error);
-  });
-
 export default App;
