@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import "./../styles/QuizProgressList.css";
+export const API_URL = import.meta.env.VITE_API_URL;
 
 // Add quiz_name to the interface
 export interface QuizProgress {
@@ -26,7 +27,7 @@ const QuizProgressList: React.FC<QuizProgressListProps> = ({ username }) => {
   useEffect(() => {
     const fetchProgressList = async () => {
       try {
-        const response = await fetch(`https://swift-ios-quizzes-backend.onrender.com/users/${username}/quizProgress`);
+        const response = await fetch(`${API_URL}users/${username}/quizProgress`);
         if (!response.ok) {
           throw new Error('Failed to fetch quiz progress');
         }

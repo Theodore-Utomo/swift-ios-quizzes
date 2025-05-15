@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+export const API_URL = import.meta.env.VITE_API_URL;
 
 interface ClassOut {
   class_id: string;
@@ -19,7 +20,7 @@ const ClassList: React.FC<ClassListProps> = ({ onSelectClass, selectedClassId })
   // Fetch classes
   const fetchClasses = async () => {
     try {
-      const res = await fetch("https://swift-ios-quizzes-backend.onrender.com/classes/");
+      const res = await fetch(`${API_URL}classes/`);
       if (!res.ok) throw new Error("Failed to fetch classes");
       const data = await res.json();
       setClasses(data);

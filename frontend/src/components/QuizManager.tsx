@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Quiz } from "../types";
 import QuizEditor from "./QuizEditor";
+export const API_URL = import.meta.env.VITE_API_URL;
+
 
 interface QuizManagerProps {
   classId: string;
@@ -16,7 +18,7 @@ const QuizManager: React.FC<QuizManagerProps> = ({ classId }) => {
 
   const fetchQuizzes = async () => {
     try {
-      const res = await fetch(`https://swift-ios-quizzes-backend.onrender.com/classes/${classId}/quizzes/`);
+      const res = await fetch(`${API_URL}classes/${classId}/quizzes/`);
       if (!res.ok) throw new Error("Failed to fetch quizzes");
       const data = await res.json();
       setQuizzes(data);

@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import QuizComponent from '../components/QuizComponent';
 import { Quiz } from '../types';
 import { jwtDecode } from "jwt-decode";
+export const API_URL = import.meta.env.VITE_API_URL;
+
 
 interface TokenPayload {
   sub: string; // this holds the username as set in your access token payload
@@ -33,7 +35,7 @@ const QuizPage: React.FC = () => {
     useEffect(() => {
         const fetchQuiz = async () => {
             try {
-                const response = await fetch(`https://swift-ios-quizzes-backend.onrender.com/classes/${classId}/quizzes/${quizId}`);
+                const response = await fetch(`${API_URL}classes/${classId}/quizzes/${quizId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch quiz');
                 }

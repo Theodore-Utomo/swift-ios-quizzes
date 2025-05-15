@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./../styles/ClassDetails.css";
+export const API_URL = import.meta.env.VITE_API_URL;
 
 interface Quiz {
   id: string;
@@ -25,7 +26,7 @@ const ClassDetails: React.FC = () => {
     const fetchData = async () => {
       try {
         // Fetch class details to display the class name.
-        const classRes = await fetch(`https://swift-ios-quizzes-backend.onrender.com/classes/${classId}`);
+        const classRes = await fetch(`${API_URL}classes/${classId}`);
         if (!classRes.ok) {
           throw new Error("Failed to fetch class info");
         }
@@ -33,7 +34,7 @@ const ClassDetails: React.FC = () => {
         setClassInfo(classData);
 
         // Fetch quizzes for the class.
-        const quizzesRes = await fetch(`https://swift-ios-quizzes-backend.onrender.com/classes/${classId}/quizzes/`);
+        const quizzesRes = await fetch(`${API_URL}classes/${classId}/quizzes/`);
         if (!quizzesRes.ok) {
           throw new Error("Failed to fetch quizzes");
         }

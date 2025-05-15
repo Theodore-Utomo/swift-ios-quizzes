@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import "./../styles/QuizComponent.css";
 import { Quiz } from '../types';
+export const API_URL = import.meta.env.VITE_API_URL;
+
 
 interface QuizComponentProps {
   quiz: Quiz;
@@ -53,7 +55,7 @@ const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, username }) => {
     
         // Save progress with additional fields: score, total_questions, and quiz_name
         try {
-            const response = await fetch(`https://swift-ios-quizzes-backend.onrender.com/users/${username}/quizProgress/${quiz.id}`, {
+            const response = await fetch(`${API_URL}users/${username}/quizProgress/${quiz.id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
