@@ -3,6 +3,7 @@ Stytch authentication service for user management.
 """
 
 import os
+from typing import Optional
 import logging
 from fastapi import HTTPException
 import stytch
@@ -26,6 +27,25 @@ class StytchService:
             project_id=os.getenv("STYTCH_PROJECT_ID"),
             secret=os.getenv("STYTCH_SECRET")
         )
+
+    @staticmethod
+    def _extract_user_id(user_obj) -> Optional[str]:
+        """Return Stytch user_id from a user object if present."""
+        return getattr(user_obj, "user_id", None)
+
+    @staticmethod
+    def _extract_primary_email(user_obj) -> Optional[str]:
+        """Return the first email address from user.emails, if available."""
+        emails = getattr(user_obj, "emails", None)
+        if not isinstance(emails, list):
+            return None
+        for item in emails:
+            email = getattr(item, "email", None)
+            if not email and isinstance(item, dict):
+                email = item.get("email")
+            if email:
+                return email
+        return None
 
     async def register_user(self, user: StytchUser) -> StytchMessageResponse:
         """Register a new user with Stytch."""
@@ -94,32 +114,11 @@ class StytchService:
             stytch_response = self.client.sessions.authenticate(
                 session_token=session_token
             )
-            # Extract user info defensively (SDK objects can vary by version)
-            user_obj = getattr(stytch_response, 'user', None)
-            stytch_user_id = getattr(stytch_response, 'user_id', None) or (
-                getattr(user_obj, 'user_id', None) if user_obj else None
-            )
-            emails_debug = '<none>'
-            user_email = None
-            try:
-                emails_field = getattr(user_obj, 'emails', []) if user_obj else []
-                parsed_emails = []
-                for item in emails_field or []:
-                    addr = getattr(item, 'email', None)
-                    if not addr and isinstance(item, dict):
-                        addr = item.get('email')
-                    if addr:
-                        parsed_emails.append(addr)
-                emails_debug = parsed_emails if parsed_emails else '<none>'
-                user_email = parsed_emails[0] if parsed_emails else None
-            except Exception:
-                pass
-            self.logger.debug(
-                "[stytch_service] authenticate_session stytch ok user_id=%s emails=%s",
-                stytch_user_id or '<none>',
-                emails_debug,
-            )
-            if not user_email:
+            user_obj = getattr(stytch_response, "user", None)
+            stytch_user_id = self._extract_user_id(user_obj) or getattr(stytch_response, "user_id", None)
+            user_email = self._extract_primary_email(user_obj)
+            self.logger.debug("[stytch_service] authenticate_session stytch ok user_id=%s", stytch_user_id or "<none>")
+            if user_email is None:
                 raise HTTPException(status_code=500, detail="No email found in session user")
             
             # Get user data from Firestore
@@ -191,14 +190,14 @@ class StytchService:
                 token=token,
                 session_duration_minutes=60,
             )
-            self.logger.debug(
-                "[stytch_service] verify_magic_link stytch ok user_id=%s emails=%s",
-                getattr(stytch_response, 'user_id', '<none>'),
-                [e.email for e in getattr(stytch_response, 'user', {}).emails] if getattr(stytch_response, 'user', None) else '<none>'
-            )
+            user_obj = getattr(stytch_response, "user", None)
+            stytch_user_id = self._extract_user_id(user_obj) or getattr(stytch_response, "user_id", None)
+            user_email = self._extract_primary_email(user_obj)
+            self.logger.debug("[stytch_service] verify_magic_link stytch ok user_id=%s", stytch_user_id or "<none>")
             
             # Get user data from Firestore
-            user_email = stytch_response.user.emails[0].email
+            if user_email is None:
+                raise HTTPException(status_code=500, detail="No email found in verified user")
             user_ref = db.collection("users").document(user_email)
             user_data = user_ref.get()
             
@@ -207,7 +206,7 @@ class StytchService:
                 user_ref.set({
                     "username": user_email,
                     "role": "student",
-                    "stytch_id": str(stytch_response.user_id),
+                    "stytch_id": str(stytch_user_id) if stytch_user_id else None,
                     "email": user_email
                 })
                 user_dict = {"role": "student"}
