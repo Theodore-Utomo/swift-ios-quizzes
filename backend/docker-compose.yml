@@ -1,0 +1,21 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - FIREBASE_CREDENTIALS=${FIREBASE_CREDENTIALS:-}
+      - STYTCH_PROJECT_ID=${STYTCH_PROJECT_ID:-}
+      - STYTCH_SECRET=${STYTCH_SECRET:-}
+      - STYTCH_ENV=${STYTCH_ENV:-test}
+    volumes:
+      # Mount app directory for development (hot reload)
+      - ./app:/app/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/docs')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

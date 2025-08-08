@@ -1,26 +1,10 @@
 import { Link } from "react-router-dom";
 import "./../styles/Navbar.css";
-import { jwtDecode } from "jwt-decode";
-
-interface DecodedToken {
-  sub: string;
-  role: string;
-  exp?: number;
-  iat?: number;
-}
 
 export default function Navbar({ onSignOut }: { onSignOut: () => void }) {
-  const token = localStorage.getItem("token");
-  let isInstructor = false;
-
-  if (token) {
-    try {
-      const decoded: DecodedToken = jwtDecode(token);
-      isInstructor = decoded.role === "instructor";
-    } catch (error) {
-      console.error("Failed to decode token:", error);
-    }
-  }
+  // Get user role from localStorage (new Stytch system)
+  const userRole = localStorage.getItem("user_role");
+  const isInstructor = userRole === "instructor";
 
   return (
     <nav className="navbar">

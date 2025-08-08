@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-export const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../services/api";
 
 interface ClassOut {
   class_id: string;
@@ -16,16 +16,24 @@ const ClassList: React.FC<ClassListProps> = ({ onSelectClass, selectedClassId })
   const [newClassName, setNewClassName] = useState<string>("");
   const [editingClassId, setEditingClassId] = useState<string | null>(null);
   const [editingClassName, setEditingClassName] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch classes
   const fetchClasses = async () => {
     try {
-      const res = await fetch(`${API_URL}classes/`);
-      if (!res.ok) throw new Error("Failed to fetch classes");
+      setLoading(true);
+      const res = await fetch(`${API_URL}/classes/`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch classes");
+      }
       const data = await res.json();
       setClasses(data);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching classes:", error);
+      setError("Failed to load classes");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,7 +45,7 @@ const ClassList: React.FC<ClassListProps> = ({ onSelectClass, selectedClassId })
   const handleAddClass = async () => {
     if (!newClassName) return;
     try {
-      const res = await fetch("http://127.0.0.1:8000/classes/", {
+      const res = await fetch(`${API_URL}/classes/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newClassName }),
@@ -46,7 +54,8 @@ const ClassList: React.FC<ClassListProps> = ({ onSelectClass, selectedClassId })
       await fetchClasses();
       setNewClassName("");
     } catch (error) {
-      console.error(error);
+      console.error("Error adding class:", error);
+      setError("Failed to add class");
     }
   };
 
@@ -54,7 +63,7 @@ const ClassList: React.FC<ClassListProps> = ({ onSelectClass, selectedClassId })
   const handleUpdateClass = async (classId: string) => {
     if (!editingClassName) return;
     try {
-      const res = await fetch(`http://127.0.0.1:8000/classes/${classId}`, {
+      const res = await fetch(`${API_URL}/classes/${classId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: editingClassName }),
@@ -64,14 +73,15 @@ const ClassList: React.FC<ClassListProps> = ({ onSelectClass, selectedClassId })
       setEditingClassId(null);
       setEditingClassName("");
     } catch (error) {
-      console.error(error);
+      console.error("Error updating class:", error);
+      setError("Failed to update class");
     }
   };
 
   // Delete a class (assumes DELETE endpoint exists at /classes/{class_id})
   const handleDeleteClass = async (classId: string) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/classes/${classId}`, {
+      const res = await fetch(`${API_URL}/classes/${classId}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete class");
@@ -80,9 +90,18 @@ const ClassList: React.FC<ClassListProps> = ({ onSelectClass, selectedClassId })
         onSelectClass("", "");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error deleting class:", error);
+      setError("Failed to delete class");
     }
   };
+
+  if (loading) {
+    return <div>Loading classes...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div>

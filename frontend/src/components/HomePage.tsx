@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./../styles/HomePage.css";
-export const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../services/api";
 
 interface ClassOut {
   class_id: string;
@@ -17,7 +17,7 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const res = await fetch(`${API_URL}classes/`);
+        const res = await fetch(`${API_URL}/classes/`);
         if (!res.ok) {
           throw new Error("Failed to fetch classes");
         }
