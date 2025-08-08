@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import InstructorPanel from './components/InstructorPanel';
-import Navbar from './components/Navbar';
+import Navbar from './components/layout/Navbar';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import AuthCallback from './pages/auth/AuthCallback';
-import HomePage from './components/HomePage';
-import ClassDetails from './components/ClassDetails';
-import QuizPage from './components/QuizPage';
+import HomePage from './pages/Home';
+import ClassDetails from './pages/ClassDetails';
+import QuizPage from './pages/Quiz';
 import ProgressPage from './components/ProgressPage';
 import stytchService from './services/stytch';
 
