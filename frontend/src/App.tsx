@@ -28,7 +28,7 @@ function App() {
       try {
         // Validate the session with the backend
         const data = await stytchService.authenticateSession(sessionToken);
-        
+        console.log("DATA", data.user_id);
         // Update localStorage with fresh data
         localStorage.setItem('stytch_session', data.session_token);
         localStorage.setItem('user_email', data.email);

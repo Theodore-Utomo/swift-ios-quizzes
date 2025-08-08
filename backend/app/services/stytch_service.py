@@ -3,12 +3,12 @@ Stytch authentication service for user management.
 """
 
 import os
+import uuid
 from typing import Optional
 import logging
 from fastapi import HTTPException
 import stytch
 from app.schemas.users import (
-    User,
     UserLogin,
     StytchUser,
     StytchAuthResponse,
@@ -47,6 +47,27 @@ class StytchService:
                 return email
         return None
 
+    def _find_user_by_email(self, email: str):
+        """Find a user document by email address."""
+        users_ref = db.collection("users")
+        query = users_ref.where("email", "==", email).limit(1)
+        results = query.get()
+        if results:
+            return results[0]
+        return None
+
+    def _create_user_with_uuid(self, email: str, stytch_user_id: Optional[str], role: str = "student"):
+        """Create a new user with a UUID as document ID."""
+        user_id = str(uuid.uuid4())
+        user_ref = db.collection("users").document(user_id)
+        user_ref.set({
+            "username": email,
+            "role": role,
+            "stytch_id": str(stytch_user_id) if stytch_user_id else None,
+            "email": email
+        })
+        return user_ref.get()
+
     async def register_user(self, user: StytchUser) -> StytchMessageResponse:
         """Register a new user with Stytch."""
         try:
@@ -65,14 +86,12 @@ class StytchService:
             elif hasattr(user.role, 'name'):
                 role_value = user.role.name.lower()
             
-            # Store additional user data in Firestore
-            user_ref = db.collection("users").document(user.email)
-            user_ref.set({
-                "username": user.email,
-                "role": role_value,
-                "stytch_id": str(stytch_user_id),  # Stytch user ID
-                "email": user.email
-            })
+            # Check if user already exists
+            existing_user = self._find_user_by_email(user.email)
+            if existing_user:
+                raise HTTPException(status_code=400, detail="User already exists")
+            
+            self._create_user_with_uuid(user.email, stytch_user_id, role_value)
             
             return StytchMessageResponse(message="User registered successfully", stytch_user_id=str(stytch_user_id))
             
@@ -86,7 +105,6 @@ class StytchService:
         """Authenticate user with Stytch and return session token."""
         try:
             # Authenticate with Stytch using email magic link or password
-            # For now, we'll use email authentication
             stytch_response = self.client.magic_links.email.login_or_create(
                 email=user.username,
                 login_magic_link_url="http://localhost:5173/auth/callback",
@@ -94,10 +112,8 @@ class StytchService:
             )
             
             # Check if user exists in our database
-            user_ref = db.collection("users").document(user.username)
-            user_data = user_ref.get()
-            
-            if not user_data.exists:
+            user_data = self._find_user_by_email(user.username)
+            if not user_data:
                 raise HTTPException(status_code=400, detail="User not found")
             
             return StytchMessageResponse(message="Magic link sent to your email", email=user.username, stytch_user_id=str(getattr(stytch_response, 'user_id', '')))
@@ -108,9 +124,7 @@ class StytchService:
     async def authenticate_session(self, session_token: str) -> StytchAuthResponse:
         """Authenticate a session token from Stytch."""
         try:
-            # Start (debug-level; avoid token noise in normal logs)
             self.logger.debug("[stytch_service] authenticate_session start")
-            # Authenticate the session token
             stytch_response = self.client.sessions.authenticate(
                 session_token=session_token
             )
@@ -122,20 +136,14 @@ class StytchService:
                 raise HTTPException(status_code=500, detail="No email found in session user")
             
             # Get user data from Firestore
-            user_ref = db.collection("users").document(user_email)
-            user_data = user_ref.get()
+            user_data = self._find_user_by_email(user_email)
             
-            if not user_data.exists:
+            if not user_data:
                 # If user missing, create a default entry for robustness
-                user_ref.set({
-                    "username": user_email,
-                    "role": "student",
-                    "stytch_id": str(stytch_user_id) if stytch_user_id else None,
-                    "email": user_email
-                })
-                user_data = user_ref.get()
+                user_data = self._create_user_with_uuid(user_email, stytch_user_id, "student")
             
             user_dict = user_data.to_dict()
+            logging.info(f"USER_DICT: {user_dict}")
             
             self.logger.info("[stytch_service] authenticate_session success email=%s role=%s", user_email, user_dict.get("role", "student"))            
             return StytchAuthResponse(
@@ -198,17 +206,11 @@ class StytchService:
             # Get user data from Firestore
             if user_email is None:
                 raise HTTPException(status_code=500, detail="No email found in verified user")
-            user_ref = db.collection("users").document(user_email)
-            user_data = user_ref.get()
+            user_data = self._find_user_by_email(user_email)
             
-            if not user_data.exists:
+            if not user_data:
                 # Create user in Firestore if they don't exist
-                user_ref.set({
-                    "username": user_email,
-                    "role": "student",
-                    "stytch_id": str(stytch_user_id) if stytch_user_id else None,
-                    "email": user_email
-                })
+                user_data = self._create_user_with_uuid(user_email, stytch_user_id, "student")
                 user_dict = {"role": "student"}
             else:
                 user_dict = user_data.to_dict()

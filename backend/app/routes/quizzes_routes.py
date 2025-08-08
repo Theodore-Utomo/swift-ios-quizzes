@@ -17,10 +17,10 @@ async def get_all_quizzes():
     return await QuizService.get_all_quizzes()
 
 
-@router.get("/{username}/quizProgress/{quiz_id}", response_model=QuizProgress)
-async def get_quiz_progress(username: str, quiz_id: str):
+@router.get("/{email}/quizProgress/{quiz_id}", response_model=QuizProgress)
+async def get_quiz_progress(email: str, quiz_id: str):
     """Get quiz progress for a specific user and quiz."""
-    return await QuizService.get_quiz_progress(username, quiz_id)
+    return await QuizService.get_quiz_progress(email, quiz_id)
 
 
 @router.post(

@@ -49,7 +49,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, email }) => 
     setScore(correctCount);
 
     try {
-      await fetch(`${API_URL}/users/${email}/quizProgress/${quiz.id}`, {
+      await fetch(`${API_URL}/quizzes/${email}/quizProgress/${quiz.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -62,7 +62,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, email }) => 
         }),
       });
     } catch (error) {
-      // noop in UI; could add a toast
+      console.log(error);
     }
   };
 
