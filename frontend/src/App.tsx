@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import InstructorPanel from './components/InstructorPanel';
+import InstructorDashboard from './components/instructor/InstructorDashboard';
 import Navbar from './components/layout/Navbar';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -90,7 +90,7 @@ function App() {
           <Navbar onSignOut={handleSignOut} />
           <Routes>
             <Route path="/home" element={<HomePage />} />
-            <Route path="/instructor-panel" element={<InstructorPanel />} />
+            <Route path="/instructor-panel" element={<InstructorDashboard />} />
             <Route path="/class/:classId" element={<ClassDetails />} />
             <Route path="/classes/:classId/quizzes/:quizId" element={<QuizPage />} />
             <Route path="/progress" element={<ProgressPage />} />

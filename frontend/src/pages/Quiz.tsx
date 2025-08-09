@@ -10,7 +10,7 @@ const QuizPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const userEmail = localStorage.getItem("user_email");
+  const userId = localStorage.getItem("user_id");
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -34,11 +34,11 @@ const QuizPage: React.FC = () => {
   if (loading) return <p>Loading quiz...</p>;
   if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
   if (!quiz) return <p>Quiz not found.</p>;
-  if (!userEmail) return <p>User not logged in.</p>;
+  if (!userId) return <p>User not logged in.</p>;
 
   return (
     <div>
-      <QuizComponent quiz={quiz} email={userEmail} />
+      <QuizComponent quiz={quiz} userId={userId} />
     </div>
   );
 };

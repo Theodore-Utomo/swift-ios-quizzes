@@ -1,6 +1,12 @@
+export enum QuestionType {
+  MCQ = "MCQ",
+  MULTIPLE_ANSWER = "Multiple_answer",
+  SHORT_ANSWER = "Short_answer"
+}
+
 export interface Question {
     question_number: number;
-    question_type: "MCQ" | "Multiple_answer" | "Short_answer";
+    question_type: QuestionType;
     question_text: string;
     question_options: string[];
     question_answer: string | string[];

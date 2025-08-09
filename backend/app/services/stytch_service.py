@@ -9,7 +9,6 @@ import logging
 from fastapi import HTTPException
 import stytch
 from app.schemas.users import (
-    UserLogin,
     StytchUser,
     StytchAuthResponse,
     StytchMessageResponse,
@@ -101,25 +100,7 @@ class StytchService:
             else:
                 raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
-    async def login_user(self, user: UserLogin) -> StytchMessageResponse:
-        """Authenticate user with Stytch and return session token."""
-        try:
-            # Authenticate with Stytch using email magic link or password
-            stytch_response = self.client.magic_links.email.login_or_create(
-                email=user.username,
-                login_magic_link_url="http://localhost:5173/auth/callback",
-                signup_magic_link_url="http://localhost:5173/auth/callback"
-            )
-            
-            # Check if user exists in our database
-            user_data = self._find_user_by_email(user.username)
-            if not user_data:
-                raise HTTPException(status_code=400, detail="User not found")
-            
-            return StytchMessageResponse(message="Magic link sent to your email", email=user.username, stytch_user_id=str(getattr(stytch_response, 'user_id', '')))
-            
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
+
 
     async def authenticate_session(self, session_token: str) -> StytchAuthResponse:
         """Authenticate a session token from Stytch."""

@@ -14,16 +14,6 @@ class QuizService:
     """Service for quiz management operations."""
 
     @staticmethod
-    def _find_user_by_email(email: str):
-        """Find a user document by email address."""
-        users_ref = db.collection("users")
-        query = users_ref.where("email", "==", email).limit(1)
-        results = query.get()
-        if results:
-            return results[0]
-        return None
-
-    @staticmethod
     async def get_all_quizzes():
         """Get all quizzes across all classes."""
         quizzes = []
@@ -42,13 +32,14 @@ class QuizService:
         return quizzes
 
     @staticmethod
-    async def get_quiz_progress(username: str, quiz_id: str):
+    async def get_quiz_progress(user_id: str, quiz_id: str):
         """Get quiz progress for a specific user and quiz."""
-        user_data = QuizService._find_user_by_email(username)
-        if not user_data:
+        # Verify user exists
+        user_ref = db.collection("users").document(user_id)
+        if not user_ref.get().exists:
             raise HTTPException(status_code=404, detail="User not found")
 
-        progress_ref = db.collection("users").document(user_data.id).collection("quizProgress").document(quiz_id)
+        progress_ref = user_ref.collection("quizProgress").document(quiz_id)
         progress_doc = progress_ref.get()
         if not progress_doc.exists:
             raise HTTPException(status_code=404, detail="Quiz progress not found")
@@ -56,15 +47,15 @@ class QuizService:
         return progress_doc.to_dict()
 
     @staticmethod
-    async def upload_quiz_progress(username: str, quiz_id: str, progress: QuizProgress):
+    async def upload_quiz_progress(user_id: str, quiz_id: str, progress: QuizProgress):
         """Upload quiz progress for a user."""
-        # Get the user document by email.
-        user_data = QuizService._find_user_by_email(username)
-        if not user_data:
+        # Verify user exists
+        user_ref = db.collection("users").document(user_id)
+        if not user_ref.get().exists:
             raise HTTPException(status_code=404, detail="User not found")
 
         # Reference the quiz progress document under the user's quizProgress subcollection.
-        progress_ref = db.collection("users").document(user_data.id).collection("quizProgress").document(quiz_id)
+        progress_ref = user_ref.collection("quizProgress").document(quiz_id)
 
         # Set timestamps: if 'started_at' isn't provided, use the current UTC time.
         now = datetime.utcnow()
@@ -80,13 +71,14 @@ class QuizService:
         return progress_data
 
     @staticmethod
-    async def list_quiz_progress(username: str):
+    async def list_quiz_progress(user_id: str):
         """Get all quiz progress for a user."""
-        user_data = QuizService._find_user_by_email(username)
-        if not user_data:
+        # Verify user exists
+        user_ref = db.collection("users").document(user_id)
+        if not user_ref.get().exists:
             raise HTTPException(status_code=404, detail="User not found")
 
-        progress_docs = db.collection("users").document(user_data.id).collection("quizProgress").stream()
+        progress_docs = user_ref.collection("quizProgress").stream()
         # Add the document id (quiz_id) to the returned data.
         return [
             QuizProgress(**{**doc.to_dict(), "quiz_id": doc.id})

@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { API_URL } from "../../services/api";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { Button } from "../ui/button";
-import { Quiz } from "../../types";
+import { Quiz, QuestionType } from "../../types";
 
 interface QuizComponentProps {
   quiz: Quiz;
-  email: string;
+  userId: string;
 }
 
-export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, email }) => {
+export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, userId }) => {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string | string[]>>({});
   const [results, setResults] = useState<Record<number, boolean>>({});
   const [score, setScore] = useState<number | null>(null);
@@ -27,14 +27,14 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, email }) => 
       const userAnswer = selectedAnswers[question.question_number];
       const correctAnswer = question.question_answer;
 
-      if (question.question_type === "MCQ") {
+      if (question.question_type === QuestionType.MCQ) {
         newResults[question.question_number] = userAnswer === correctAnswer;
-      } else if (question.question_type === "Multiple_answer") {
+      } else if (question.question_type === QuestionType.MULTIPLE_ANSWER) {
         newResults[question.question_number] =
           Array.isArray(userAnswer) &&
           userAnswer.length === (correctAnswer as string[]).length &&
           userAnswer.every((ans) => (correctAnswer as string[]).includes(ans));
-      } else if (question.question_type === "Short_answer") {
+      } else if (question.question_type === QuestionType.SHORT_ANSWER) {
         newResults[question.question_number] =
           typeof userAnswer === "string" &&
           (correctAnswer as string[]).some(
@@ -49,7 +49,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, email }) => 
     setScore(correctCount);
 
     try {
-      await fetch(`${API_URL}/quizzes/${email}/quizProgress/${quiz.id}`, {
+      await fetch(`${API_URL}/quizzes/${userId}/quizProgress/${quiz.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -78,11 +78,11 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, email }) => 
             <div key={q.question_number} className="space-y-3">
               <h3 className="font-medium">{q.question_text}</h3>
               <div className="space-y-2">
-                {(q.question_type === "MCQ" || q.question_type === "Multiple_answer") && (
+                {(q.question_type === QuestionType.MCQ || q.question_type === QuestionType.MULTIPLE_ANSWER) && (
                   <div className="grid gap-2">
                     {q.question_options.map((option) => {
                       const name = `question-${q.question_number}`;
-                      const isMulti = q.question_type === "Multiple_answer";
+                      const isMulti = q.question_type === QuestionType.MULTIPLE_ANSWER;
                       const checked = isMulti
                         ? Array.isArray(selectedAnswers[q.question_number]) &&
                           (selectedAnswers[q.question_number] as string[]).includes(option)
@@ -115,7 +115,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, email }) => 
                     })}
                   </div>
                 )}
-                {q.question_type === "Short_answer" && (
+                {q.question_type === QuestionType.SHORT_ANSWER && (
                   <input
                     type="text"
                     className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
