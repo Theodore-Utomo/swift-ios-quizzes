@@ -3,7 +3,7 @@ Quiz management service.
 """
 
 from fastapi import HTTPException
-from typing import List
+from typing import List, Optional
 from app.schemas.quiz import Quiz
 from app.schemas.quiz_progress import QuizProgress
 from app.database import db
@@ -32,9 +32,10 @@ class QuizService:
         return quizzes
 
     @staticmethod
-    async def get_quiz_progress(username: str, quiz_id: str):
+    async def get_quiz_progress(user_id: str, quiz_id: str):
         """Get quiz progress for a specific user and quiz."""
-        user_ref = db.collection("users").document(username)
+        # Verify user exists
+        user_ref = db.collection("users").document(user_id)
         if not user_ref.get().exists:
             raise HTTPException(status_code=404, detail="User not found")
 
@@ -46,10 +47,10 @@ class QuizService:
         return progress_doc.to_dict()
 
     @staticmethod
-    async def upload_quiz_progress(username: str, quiz_id: str, progress: QuizProgress):
+    async def upload_quiz_progress(user_id: str, quiz_id: str, progress: QuizProgress):
         """Upload quiz progress for a user."""
-        # Get the user document by username.
-        user_ref = db.collection("users").document(username)
+        # Verify user exists
+        user_ref = db.collection("users").document(user_id)
         if not user_ref.get().exists:
             raise HTTPException(status_code=404, detail="User not found")
 
@@ -70,9 +71,10 @@ class QuizService:
         return progress_data
 
     @staticmethod
-    async def list_quiz_progress(username: str):
+    async def list_quiz_progress(user_id: str):
         """Get all quiz progress for a user."""
-        user_ref = db.collection("users").document(username)
+        # Verify user exists
+        user_ref = db.collection("users").document(user_id)
         if not user_ref.get().exists:
             raise HTTPException(status_code=404, detail="User not found")
 

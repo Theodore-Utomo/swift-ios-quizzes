@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import InstructorPanel from './components/InstructorPanel';
-import Navbar from './components/Navbar';
+import InstructorDashboard from './components/instructor/InstructorDashboard';
+import Navbar from './components/layout/Navbar';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import AuthCallback from './pages/auth/AuthCallback';
-import HomePage from './components/HomePage';
-import ClassDetails from './components/ClassDetails';
-import QuizPage from './components/QuizPage';
+import HomePage from './pages/Home';
+import ClassDetails from './pages/ClassDetails';
+import QuizPage from './pages/Quiz';
 import ProgressPage from './components/ProgressPage';
 import stytchService from './services/stytch';
 
@@ -28,7 +28,7 @@ function App() {
       try {
         // Validate the session with the backend
         const data = await stytchService.authenticateSession(sessionToken);
-        
+        console.log("DATA", data.user_id);
         // Update localStorage with fresh data
         localStorage.setItem('stytch_session', data.session_token);
         localStorage.setItem('user_email', data.email);
@@ -90,7 +90,7 @@ function App() {
           <Navbar onSignOut={handleSignOut} />
           <Routes>
             <Route path="/home" element={<HomePage />} />
-            <Route path="/instructor-panel" element={<InstructorPanel />} />
+            <Route path="/instructor-panel" element={<InstructorDashboard />} />
             <Route path="/class/:classId" element={<ClassDetails />} />
             <Route path="/classes/:classId/quizzes/:quizId" element={<QuizPage />} />
             <Route path="/progress" element={<ProgressPage />} />
