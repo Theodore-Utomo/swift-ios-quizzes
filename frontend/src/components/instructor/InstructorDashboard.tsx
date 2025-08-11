@@ -9,12 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import QuizEditor from "./QuizEditor";
-import { API_URL } from "../../services/api";
-import { Quiz } from "../../types";
+import { apiService } from "../../services/api";
+import { Quiz, ClassOut } from "../../types";
 
-interface ClassData {
-  class_id: string;
-  name: string;
+interface ClassData extends ClassOut {
   quiz_count?: number;
 }
 
@@ -43,20 +41,15 @@ const InstructorDashboard: React.FC = () => {
   const fetchClasses = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/classes/`);
-      if (!res.ok) throw new Error("Failed to fetch classes");
-      const data = await res.json();
+      const res = await apiService.getClasses();
+      const data = res.data;
       
       // Fetch quiz count for each class
       const classesWithQuizCount = await Promise.all(
         data.map(async (cls: ClassData) => {
           try {
-            const quizRes = await fetch(`${API_URL}/classes/${cls.class_id}/quizzes/`);
-            if (quizRes.ok) {
-              const quizData = await quizRes.json();
-              return { ...cls, quiz_count: quizData.length };
-            }
-            return { ...cls, quiz_count: 0 };
+            const quizRes = await apiService.getClassQuizzes(cls.class_id);
+            return { ...cls, quiz_count: quizRes.data.length };
           } catch {
             return { ...cls, quiz_count: 0 };
           }
@@ -74,10 +67,8 @@ const InstructorDashboard: React.FC = () => {
   // Fetch quizzes for selected class
   const fetchQuizzes = async (classId: string) => {
     try {
-      const res = await fetch(`${API_URL}/classes/${classId}/quizzes/`);
-      if (!res.ok) throw new Error("Failed to fetch quizzes");
-      const data = await res.json();
-      setQuizzes(data);
+      const res = await apiService.getClassQuizzes(classId);
+      setQuizzes(res.data);
     } catch (error: any) {
       setError(error.message);
     }
@@ -98,12 +89,7 @@ const InstructorDashboard: React.FC = () => {
     if (!newClassName.trim()) return;
     
     try {
-      const res = await fetch(`${API_URL}/classes/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newClassName }),
-      });
-      if (!res.ok) throw new Error("Failed to create class");
+      await apiService.createClass({ name: newClassName });
       
       await fetchClasses();
       setNewClassName("");
@@ -117,12 +103,7 @@ const InstructorDashboard: React.FC = () => {
     if (!editingClass || !editClassName.trim()) return;
     
     try {
-      const res = await fetch(`${API_URL}/classes/${editingClass.class_id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: editClassName }),
-      });
-      if (!res.ok) throw new Error("Failed to update class");
+      await apiService.updateClass(editingClass.class_id, { name: editClassName });
       
       await fetchClasses();
       setEditingClass(null);
@@ -139,10 +120,7 @@ const InstructorDashboard: React.FC = () => {
 
   const handleDeleteClass = async (classId: string) => {
     try {
-      const res = await fetch(`${API_URL}/classes/${classId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed to delete class");
+      await apiService.deleteClass(classId);
       
       await fetchClasses();
       if (selectedClass && selectedClass.class_id === classId) {
@@ -159,12 +137,7 @@ const InstructorDashboard: React.FC = () => {
     if (!selectedClass) return;
     
     try {
-      const res = await fetch(`${API_URL}/classes/${selectedClass.class_id}/quizzes/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(quiz),
-      });
-      if (!res.ok) throw new Error("Failed to create quiz");
+      await apiService.createQuiz(selectedClass.class_id, quiz);
       
       await fetchQuizzes(selectedClass.class_id);
       await fetchClasses();
@@ -179,12 +152,7 @@ const InstructorDashboard: React.FC = () => {
     if (!selectedClass) return;
     
     try {
-      const res = await fetch(`${API_URL}/classes/${selectedClass.class_id}/quizzes/${quiz.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(quiz),
-      });
-      if (!res.ok) throw new Error("Failed to update quiz");
+      await apiService.updateQuiz(selectedClass.class_id, quiz.id, quiz);
       
       await fetchQuizzes(selectedClass.class_id);
       setEditingQuiz(null);
@@ -198,10 +166,7 @@ const InstructorDashboard: React.FC = () => {
     if (!selectedClass) return;
     
     try {
-      const res = await fetch(`${API_URL}/classes/${selectedClass.class_id}/quizzes/${quizId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed to delete quiz");
+      await apiService.deleteQuiz(selectedClass.class_id, quizId);
       
       await fetchQuizzes(selectedClass.class_id);
       await fetchClasses();

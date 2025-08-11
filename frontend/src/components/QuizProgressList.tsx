@@ -4,29 +4,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClockIcon, CheckCircleIcon, XCircleIcon, PlayIcon } from "lucide-react";
-import { API_URL } from "../services/api";
+import { useUserApi } from "../hooks/useUserApi";
+import { QuizProgress } from "../types";
 
-// Add quiz_name to the interface
-export interface QuizProgress {
-  quiz_id?: string;
-  quiz_name?: string; // New field for quiz name
-  current_question: number;
-  answers: { [key: string]: string };
-  status: string;
-  score?: number;
-  total_questions?: number;
-  started_at?: string;
-  updated_at?: string;
-}
+interface QuizProgressListProps {}
 
-interface QuizProgressListProps {
-  userId: string;
-}
-
-const QuizProgressList: React.FC<QuizProgressListProps> = ({ userId }) => {
+const QuizProgressList: React.FC<QuizProgressListProps> = () => {
   const [progressList, setProgressList] = useState<QuizProgress[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const userApi = useUserApi();
 
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
@@ -71,13 +59,8 @@ const QuizProgressList: React.FC<QuizProgressListProps> = ({ userId }) => {
   useEffect(() => {
     const fetchProgressList = async () => {
       try {
-        const response = await fetch(`${API_URL}/quizzes/${userId}/quizProgress`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch quiz progress');
-        }
-        const data: QuizProgress[] = await response.json();
-        console.log(data);
-        setProgressList(data);
+        const response = await userApi.getMyQuizProgress();
+        setProgressList(response.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {
@@ -86,7 +69,7 @@ const QuizProgressList: React.FC<QuizProgressListProps> = ({ userId }) => {
     };
 
     fetchProgressList();
-  }, [userId]);
+  }, [userApi]);
 
   if (loading) {
     return (

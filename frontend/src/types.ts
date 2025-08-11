@@ -28,3 +28,40 @@ export interface TokenResponse {
 export interface LoginProps {
     onLogin: (token: string) => void;
 }
+
+// Class types
+export interface ClassCreate {
+    name: string;
+}
+
+export interface ClassOut {
+    class_id: string;
+    name: string;
+}
+
+// Quiz Progress types
+export interface QuizProgress {
+    quiz_id?: string;
+    quiz_name?: string;
+    current_question?: number;
+    answers?: Record<number, string | string[]>;
+    status: string;
+    score?: number;
+    total_questions?: number;
+    started_at?: string;
+    updated_at?: string;
+}
+
+export interface QuizProgressSubmission {
+    current_question: number;
+    answers: Record<number, string | string[]>;
+    status: string;
+    score: number;
+    total_questions: number;
+    quiz_name: string;
+}
+
+// Auth types
+export interface AuthRequest {
+    session_token: string;
+}

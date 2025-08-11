@@ -4,11 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { Quiz, Question, QuestionType } from "../../types";
 
 interface QuizEditorProps {
@@ -108,7 +108,6 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
         return;
       }
 
-      // Validate that MCQ/Multiple Answer questions have answers from available options
       if (question.question_type === QuestionType.MCQ || question.question_type === QuestionType.MULTIPLE_ANSWER) {
         const answerArray = typeof question.question_answer === "string" 
           ? question.question_answer.split(", ").filter(a => a.trim())
@@ -212,13 +211,13 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
                   {/* Question Text */}
                   <div className="space-y-2">
                     <Label>Question Text</Label>
-                    <Textarea
+                    <MarkdownEditor
                       value={question.question_text}
-                      onChange={(e) =>
-                        handleQuestionChange(index, "question_text", e.target.value)
+                      onChange={(value) =>
+                        handleQuestionChange(index, "question_text", value)
                       }
-                      placeholder="Enter your question..."
-                      rows={3}
+                      placeholder="Enter your question... (Supports Markdown for code syntax highlighting)"
+                      rows={4}
                     />
                   </div>
 

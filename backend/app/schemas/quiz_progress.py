@@ -5,10 +5,10 @@ from typing import Dict, Optional
 
 class QuizProgress(BaseModel):
     current_question: int
-    answers: Dict[str, str] = {}  # Map of question IDs to answers
-    status: str  # e.g., "in-progress", "completed"
+    answers: Dict[str, str] = {}  
+    status: str  
     score: Optional[int] = None
     total_questions: Optional[int] = None
-    quiz_name: Optional[str] = None  # <-- New field for quiz name
+    quiz_name: Optional[str] = None  
     started_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

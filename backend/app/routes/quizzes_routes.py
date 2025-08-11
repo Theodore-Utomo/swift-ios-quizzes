@@ -11,12 +11,6 @@ from app.services.quiz_service import QuizService
 router = APIRouter()
 
 
-@router.get("/", response_model=List[Quiz])
-async def get_all_quizzes():
-    """Get all quizzes across all classes."""
-    return await QuizService.get_all_quizzes()
-
-
 @router.get("/{user_id}/quizProgress/{quiz_id}", response_model=QuizProgress)
 async def get_quiz_progress(user_id: str, quiz_id: str):
     """Get quiz progress for a specific user and quiz."""

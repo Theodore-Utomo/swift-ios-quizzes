@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import InstructorDashboard from './components/instructor/InstructorDashboard';
 import Navbar from './components/layout/Navbar';
@@ -9,62 +9,12 @@ import HomePage from './pages/Home';
 import ClassDetails from './pages/ClassDetails';
 import QuizPage from './pages/Quiz';
 import ProgressPage from './components/ProgressPage';
-import stytchService from './services/stytch';
+import { UserProvider } from './contexts/UserContext';
+import { useAuth } from './hooks/useAuth';
 
-function App() {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  // Validate session on app load
-  useEffect(() => {
-    const validateSession = async () => {
-      const sessionToken = localStorage.getItem('stytch_session');
-      
-      if (!sessionToken) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        // Validate the session with the backend
-        const data = await stytchService.authenticateSession(sessionToken);
-        console.log("DATA", data.user_id);
-        // Update localStorage with fresh data
-        localStorage.setItem('stytch_session', data.session_token);
-        localStorage.setItem('user_email', data.email);
-        localStorage.setItem('user_role', data.role);
-        localStorage.setItem('user_id', data.user_id);
-        if (data.stytch_user_id) {
-          localStorage.setItem('stytch_user_id', data.stytch_user_id);
-        }
-        
-        setIsLoggedIn(true);
-      } catch (err) {
-        console.error('Session validation failed:', err);
-        // Clear invalid session data
-        localStorage.removeItem('stytch_session');
-        localStorage.removeItem('user_email');
-        localStorage.removeItem('user_role');
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('stytch_user_id');
-        setIsLoggedIn(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    validateSession();
-  }, []);
-
-  const handleSignOut = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('stytch_session');
-    localStorage.removeItem('user_email');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('stytch_user_id');
-    setIsLoggedIn(false);
-  };
+// App content component that uses the UserContext
+const AppContent: React.FC = () => {
+  const { isAuthenticated, loading, login, logout } = useAuth();
 
   if (loading) {
     return (
@@ -77,17 +27,21 @@ function App() {
     );
   }
 
-  const handleLogin = (sessionToken: string) => {
-    // Store the Stytch session token
-    localStorage.setItem('stytch_session', sessionToken);
-    setIsLoggedIn(true);
+  const handleLogin = async (sessionToken: string) => {
+    try {
+      await login(sessionToken);
+    } catch (error) {
+      console.error('Login failed:', error);
+      // The error will be handled by the login components
+      throw error;
+    }
   };
 
   return (
     <Router>
-      {isLoggedIn ? (
+      {isAuthenticated ? (
         <>
-          <Navbar onSignOut={handleSignOut} />
+          <Navbar onSignOut={logout} />
           <Routes>
             <Route path="/home" element={<HomePage />} />
             <Route path="/instructor-panel" element={<InstructorDashboard />} />
@@ -106,6 +60,14 @@ function App() {
         </Routes>
       )}
     </Router>
+  );
+};
+
+function App() {
+  return (
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
   );
 }
 

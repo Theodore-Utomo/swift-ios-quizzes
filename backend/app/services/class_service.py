@@ -13,14 +13,14 @@ class ClassService:
     """Service for class management operations."""
 
     @staticmethod
-    async def create_class(body: ClassCreate):
+    async def create_class(body: ClassCreate) -> ClassOut:
         """Create a new class."""
         class_ref = db.collection("classes").document()
         class_ref.set(body.dict())
         return ClassOut(class_id=class_ref.id, **body.dict())
 
     @staticmethod
-    async def list_classes():
+    async def list_classes() -> List[ClassOut]:
         """Get all classes."""
         return [
             ClassOut(class_id=doc.id, **doc.to_dict())
@@ -28,7 +28,7 @@ class ClassService:
         ]
 
     @staticmethod
-    async def get_class(class_id: str):
+    async def get_class(class_id: str) -> ClassOut:
         """Get a specific class by ID."""
         doc = db.collection("classes").document(class_id).get()
         if not doc.exists:
@@ -36,7 +36,7 @@ class ClassService:
         return ClassOut(class_id=doc.id, **doc.to_dict())
 
     @staticmethod
-    async def update_class(class_id: str, body: ClassCreate):
+    async def update_class(class_id: str, body: ClassCreate) -> ClassOut:
         """Update a class."""
         class_ref = db.collection("classes").document(class_id)
         if not class_ref.get().exists:
