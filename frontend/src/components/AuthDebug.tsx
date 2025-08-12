@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiService } from '../services/api';
 
 const AuthDebug: React.FC = () => {
   const stytchSession = localStorage.getItem('stytch_session');
@@ -28,20 +29,9 @@ const AuthDebug: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${apiUrl}/authenticate/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_token: stytchSession }),
-      });
+      const response = await apiService.authenticate({ session_token: stytchSession });
 
-      let body: unknown = null;
-      try {
-        body = await response.json();
-      } catch {
-        body = await response.text();
-      }
-
-      setValidationResult({ ok: response.ok, status: response.status, body });
+      setValidationResult({ ok: true, status: response.status, body: response.data });
     } catch (err: any) {
       setValidationError(err?.message ?? String(err));
     } finally {

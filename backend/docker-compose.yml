@@ -4,12 +4,17 @@ services:
     ports:
       - "8000:8000"
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file:
+      - .env
     environment:
       - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
       - FIREBASE_CREDENTIALS=${FIREBASE_CREDENTIALS:-}
       - STYTCH_PROJECT_ID=${STYTCH_PROJECT_ID:-}
       - STYTCH_SECRET=${STYTCH_SECRET:-}
       - STYTCH_ENV=${STYTCH_ENV:-test}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,https://my-quiz-app-frontend.onrender.com}
     volumes:
       # Mount app directory for development (hot reload)
       - ./app:/app/app

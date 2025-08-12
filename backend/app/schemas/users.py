@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field, validator
 from typing import Optional
+import re
 from app.schemas.role_enum import UserRole
 
 
@@ -29,7 +30,21 @@ class StytchLogin(BaseModel):
 
 
 class StytchSession(BaseModel):
-    session_token: str
+    session_token: str = Field(
+        ...,
+        min_length=10,
+        max_length=1000,
+        description="Stytch session token"
+    )
+    
+    @validator('session_token')
+    def validate_session_token(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Session token cannot be empty')
+        # Basic validation - should be alphanumeric with some special chars
+        if not re.match(r'^[a-zA-Z0-9\-_.]+$', v):
+            raise ValueError('Invalid session token format')
+        return v.strip()
 
 
 class MagicLinkRequest(BaseModel):
@@ -37,7 +52,21 @@ class MagicLinkRequest(BaseModel):
 
 
 class MagicLinkVerify(BaseModel):
-    token: str
+    token: str = Field(
+        ...,
+        min_length=10,
+        max_length=1000,
+        description="Magic link verification token"
+    )
+    
+    @validator('token')
+    def validate_token(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Token cannot be empty')
+        # Basic validation for magic link token
+        if not re.match(r'^[a-zA-Z0-9\-_.]+$', v):
+            raise ValueError('Invalid token format')
+        return v.strip()
 
 
 class StytchAuthResponse(BaseModel):

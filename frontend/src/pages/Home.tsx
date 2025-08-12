@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../services/api";
+import { apiService } from "../services/api";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-
-interface ClassOut {
-  class_id: string;
-  name: string;
-}
+import { ClassOut } from "../types/class";
 
 const HomePage: React.FC = () => {
   const [classes, setClasses] = useState<ClassOut[]>([]);
@@ -18,12 +14,8 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const res = await fetch(`${API_URL}/classes/`);
-        if (!res.ok) {
-          throw new Error("Failed to fetch classes");
-        }
-        const data = await res.json();
-        setClasses(data);
+        const res = await apiService.getClasses();
+        setClasses(res.data);
       } catch (err: any) {
         setError(err.message);
       } finally {

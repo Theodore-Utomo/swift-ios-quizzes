@@ -40,8 +40,8 @@ const AuthCallback: React.FC<AuthCallbackProps> = ({ onLogin }) => {
         localStorage.setItem('user_email', data.email);
         localStorage.setItem('user_role', data.role);
         localStorage.setItem('user_id', data.user_id);
-        if ((data as any).stytch_user_id) {
-          localStorage.setItem('stytch_user_id', (data as any).stytch_user_id);
+        if (data.stytch_user_id) {
+          localStorage.setItem('stytch_user_id', data.stytch_user_id);
         }
 
         // Call the login handler

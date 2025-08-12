@@ -1,22 +1,25 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Request
 from app.schemas.users import (
     StytchUser, StytchLogin, StytchSession,
     MagicLinkRequest, MagicLinkVerify, StytchAuthResponse, StytchMessageResponse
 )
 from app.services.stytch_service import StytchService
+from app.middleware.rate_limiting import limiter
 
 router = APIRouter()
 
 
 @router.post("/register/", response_model=StytchMessageResponse)
-async def register_user(user: StytchUser):
+@limiter.limit("5 per minute")
+async def register_user(request: Request, user: StytchUser):
     """Register a new user with Stytch."""
     stytch_service = StytchService()
     return await stytch_service.register_user(user)
 
 
 @router.post("/login/", response_model=StytchMessageResponse)
-async def login_stytch(user: StytchLogin):
+@limiter.limit("10 per minute")
+async def login_stytch(request: Request, user: StytchLogin):
     """Send magic link for Stytch authentication."""
     stytch_service = StytchService()
     return await stytch_service.send_magic_link(user.email)
@@ -44,7 +47,8 @@ async def logout_stytch(session_data: StytchSession):
 
 
 @router.post("/send-magic-link/", response_model=StytchMessageResponse)
-async def send_magic_link(request: MagicLinkRequest):
+@limiter.limit("5 per minute")
+async def send_magic_link(request: Request, magic_link_request: MagicLinkRequest):
     """Send magic link to user's email."""
     stytch_service = StytchService()
-    return await stytch_service.send_magic_link(request.email)
+    return await stytch_service.send_magic_link(magic_link_request.email)

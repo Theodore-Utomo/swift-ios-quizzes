@@ -1,54 +1,49 @@
-import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ClockIcon, CheckCircleIcon, XCircleIcon, PlayIcon } from "lucide-react";
-import { API_URL } from "../services/api";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Badge } from './ui/badge';
+import { Skeleton } from './ui/skeleton';
+import { CheckCircleIcon, ClockIcon, PlayIcon, XCircleIcon } from 'lucide-react';
+import { QuizProgress, QuizProgressStatus } from "../types/progress";
+import { useUserApi } from '../hooks/useUserApi';
 
-// Add quiz_name to the interface
-export interface QuizProgress {
-  quiz_id?: string;
-  quiz_name?: string; // New field for quiz name
-  current_question: number;
-  answers: { [key: string]: string };
-  status: string;
-  score?: number;
-  total_questions?: number;
-  started_at?: string;
-  updated_at?: string;
-}
+interface QuizProgressListProps {}
 
-interface QuizProgressListProps {
-  userId: string;
-}
-
-const QuizProgressList: React.FC<QuizProgressListProps> = ({ userId }) => {
+const QuizProgressList: React.FC<QuizProgressListProps> = () => {
   const [progressList, setProgressList] = useState<QuizProgress[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const userApi = useUserApi();
 
-  const getStatusBadge = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'completed':
+  const getStatusBadge = (status: QuizProgressStatus) => {
+    switch (status) {
+      case QuizProgressStatus.COMPLETED:
         return (
           <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
             <CheckCircleIcon className="w-3 h-3 mr-1" />
             Completed
           </Badge>
         );
-      case 'in_progress':
+      case QuizProgressStatus.IN_PROGRESS:
         return (
           <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">
             <ClockIcon className="w-3 h-3 mr-1" />
             In Progress
           </Badge>
         );
-      case 'not_started':
+      case QuizProgressStatus.NOT_STARTED:
         return (
           <Badge variant="outline" className="bg-gray-100 text-gray-800 hover:bg-gray-200">
             <PlayIcon className="w-3 h-3 mr-1" />
             Not Started
+          </Badge>
+        );
+      case QuizProgressStatus.ABANDONED:
+        return (
+          <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-200">
+            <XCircleIcon className="w-3 h-3 mr-1" />
+            Abandoned
           </Badge>
         );
       default:
@@ -71,13 +66,8 @@ const QuizProgressList: React.FC<QuizProgressListProps> = ({ userId }) => {
   useEffect(() => {
     const fetchProgressList = async () => {
       try {
-        const response = await fetch(`${API_URL}/quizzes/${userId}/quizProgress`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch quiz progress');
-        }
-        const data: QuizProgress[] = await response.json();
-        console.log(data);
-        setProgressList(data);
+        const response = await userApi.getMyQuizProgress();
+        setProgressList(response.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {
@@ -86,7 +76,7 @@ const QuizProgressList: React.FC<QuizProgressListProps> = ({ userId }) => {
     };
 
     fetchProgressList();
-  }, [userId]);
+  }, [userApi]);
 
   if (loading) {
     return (

@@ -3,6 +3,8 @@ fastapi==0.115.6
 uvicorn[standard]==0.27.1
 pydantic==2.10.5
 pydantic-settings==2.7.1
+slowapi==0.1.9
+redis==5.0.1
 
 # Authentication
 python-jose[cryptography]==3.3.0
@@ -10,7 +12,7 @@ passlib[bcrypt]==1.7.4
 python-multipart==0.0.20
 
 # Stytch SDK
-stytch==8.0.0
+stytch==13.16.0
 
 # Firebase
 firebase-admin==6.7.0

@@ -1,19 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { API_URL } from "../services/api";
+import { apiService } from "../services/api";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-
-interface Quiz {
-  id: string;
-  name: string;
-  content: any[];
-}
-
-interface ClassOut {
-  class_id: string;
-  name: string;
-}
+import { Quiz } from "../types/quiz";
+import { ClassOut } from "../types/class";
 
 const ClassDetails: React.FC = () => {
   const { classId } = useParams<{ classId: string }>();
@@ -26,15 +17,11 @@ const ClassDetails: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const classRes = await fetch(`${API_URL}/classes/${classId}`);
-        if (!classRes.ok) throw new Error("Failed to fetch class details");
-        const classData: ClassOut = await classRes.json();
-        setClassInfo(classData);
+        const classRes = await apiService.getClass(classId!);
+        setClassInfo(classRes.data);
 
-        const quizzesRes = await fetch(`${API_URL}/classes/${classId}/quizzes/`);
-        if (!quizzesRes.ok) throw new Error("Failed to fetch quizzes");
-        const quizzesData: Quiz[] = await quizzesRes.json();
-        setQuizzes(quizzesData);
+        const quizzesRes = await apiService.getClassQuizzes(classId!);
+        setQuizzes(quizzesRes.data);
       } catch (err: any) {
         setError(err.message || "Something went wrong");
       } finally {

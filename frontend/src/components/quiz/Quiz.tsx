@@ -1,19 +1,22 @@
 import React, { useState } from "react";
-import { API_URL } from "../../services/api";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { Button } from "../ui/button";
-import { Quiz, QuestionType } from "../../types";
+import { MarkdownRenderer } from "../ui/markdown-renderer";
+import { useUserApi } from "../../hooks/useUserApi";
+import { Quiz, QuestionType } from "../../types/quiz";
+import { QuizProgressStatus } from "../../types/progress";
 
 interface QuizComponentProps {
   quiz: Quiz;
-  userId: string;
 }
 
-export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, userId }) => {
+export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string | string[]>>({});
   const [results, setResults] = useState<Record<number, boolean>>({});
   const [score, setScore] = useState<number | null>(null);
   const total = quiz.content.length;
+  
+  const userApi = useUserApi();
 
   const handleAnswerSelect = (questionNumber: number, answer: string | string[]) => {
     setSelectedAnswers((prev) => ({ ...prev, [questionNumber]: answer }));
@@ -35,11 +38,18 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, userId }) =>
           userAnswer.length === (correctAnswer as string[]).length &&
           userAnswer.every((ans) => (correctAnswer as string[]).includes(ans));
       } else if (question.question_type === QuestionType.SHORT_ANSWER) {
-        newResults[question.question_number] =
-          typeof userAnswer === "string" &&
-          (correctAnswer as string[]).some(
-            (correct) => correct.toLowerCase() === userAnswer.toLowerCase()
-          );
+        if (typeof userAnswer === "string") {
+          if (Array.isArray(correctAnswer)) {
+            newResults[question.question_number] = correctAnswer.some(
+              (correct) => correct.toLowerCase() === userAnswer.toLowerCase()
+            );
+          } else {
+            newResults[question.question_number] =
+              correctAnswer.toLowerCase() === userAnswer.toLowerCase();
+          }
+        } else {
+          newResults[question.question_number] = false;
+        }
       }
 
       if (newResults[question.question_number]) correctCount++;
@@ -49,21 +59,18 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, userId }) =>
     setScore(correctCount);
 
     try {
-      await fetch(`${API_URL}/quizzes/${userId}/quizProgress/${quiz.id}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          current_question: 1,
-          answers: selectedAnswers,
-          status: "completed",
-          score: correctCount,
-          total_questions: total,
-          quiz_name: quiz.name,
-        }),
+      await userApi.submitMyQuizProgress(quiz.id, {
+        current_question: 1,
+        answers: selectedAnswers,
+        status: QuizProgressStatus.COMPLETED,
+        score: correctCount,
+        total_questions: total,
+        quiz_name: quiz.name,
       });
     } catch (error) {
       console.log(error);
     }
+
   };
 
   return (
@@ -76,7 +83,9 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, userId }) =>
         <CardContent className="space-y-6">
           {quiz.content.map((q) => (
             <div key={q.question_number} className="space-y-3">
-              <h3 className="font-medium">{q.question_text}</h3>
+              <div className="font-medium">
+                <MarkdownRenderer content={q.question_text} />
+              </div>
               <div className="space-y-2">
                 {(q.question_type === QuestionType.MCQ || q.question_type === QuestionType.MULTIPLE_ANSWER) && (
                   <div className="grid gap-2">
@@ -85,7 +94,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, userId }) =>
                       const isMulti = q.question_type === QuestionType.MULTIPLE_ANSWER;
                       const checked = isMulti
                         ? Array.isArray(selectedAnswers[q.question_number]) &&
-                          (selectedAnswers[q.question_number] as string[]).includes(option)
+                        (selectedAnswers[q.question_number] as string[]).includes(option)
                         : selectedAnswers[q.question_number] === option;
                       return (
                         <label
