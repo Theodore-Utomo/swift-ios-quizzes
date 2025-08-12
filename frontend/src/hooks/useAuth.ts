@@ -1,46 +1,51 @@
 import { useUser } from '../contexts/UserContext';
 
 export const useAuth = () => {
-  const { user, isAuthenticated, loading, login, logout, updateUser } = useUser();
+  try {
+    const { user, isAuthenticated, loading, login, logout, updateUser } = useUser();
 
-  // Convenience methods
-  const getUserId = () => user?.id || null;
-  const getUserEmail = () => user?.email || null;
-  const getUserRole = () => user?.role || null;
-  const getSessionToken = () => user?.sessionToken || null;
-  const isInstructor = () => user?.role === 'instructor';
-  const isStudent = () => user?.role === 'student';
-
-  // Require authentication wrapper
-  const requireAuth = () => {
-    if (!isAuthenticated) {
-      throw new Error('User must be authenticated');
-    }
-    return user!;
-  };
-
-  return {
-    // User data
-    user,
-    isAuthenticated,
-    loading,
-    
-    // Actions
-    login,
-    logout,
-    updateUser,
-    
-    // Convenience getters
-    getUserId,
-    getUserEmail,
-    getUserRole,
-    getSessionToken,
-    isInstructor,
-    isStudent,
-    
-    // Utilities
-    requireAuth,
-  };
+    // Return the context data
+    return {
+      user,
+      isAuthenticated,
+      loading,
+      login,
+      logout,
+      updateUser,
+      getUserId: () => user?.id || null,
+      getUserEmail: () => user?.email || null,
+      getUserRole: () => user?.role || null,
+      getSessionToken: () => user?.sessionToken || null,
+      isInstructor: () => user?.role === 'instructor',
+      isStudent: () => user?.role === 'student',
+      requireAuth: () => {
+        if (!isAuthenticated) {
+          throw new Error('User must be authenticated');
+        }
+        return user!;
+      },
+    };
+  } catch (error) {
+    console.error('useAuth error:', error);
+    // Return safe defaults if context is not available
+    return {
+      user: null,
+      isAuthenticated: false,
+      loading: true,
+      login: async () => {},
+      logout: () => {},
+      updateUser: () => {},
+      getUserId: () => null,
+      getUserEmail: () => null,
+      getUserRole: () => null,
+      getSessionToken: () => null,
+      isInstructor: () => false,
+      isStudent: () => false,
+      requireAuth: () => {
+        throw new Error('User must be authenticated');
+      },
+    };
+  }
 };
 
 export default useAuth;

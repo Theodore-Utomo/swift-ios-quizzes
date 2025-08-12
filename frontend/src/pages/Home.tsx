@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiService } from "../services/api";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { ClassOut } from "../types";
+import { ClassOut } from "../types/class";
 
 const HomePage: React.FC = () => {
   const [classes, setClasses] = useState<ClassOut[]>([]);

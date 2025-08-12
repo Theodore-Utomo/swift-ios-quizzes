@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { apiService } from "../services/api";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Quiz, ClassOut } from "../types";
+import { Quiz } from "../types/quiz";
+import { ClassOut } from "../types/class";
 
 const ClassDetails: React.FC = () => {
   const { classId } = useParams<{ classId: string }>();

@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import QuizEditor from "./QuizEditor";
 import { apiService } from "../../services/api";
-import { Quiz, ClassOut } from "../../types";
+import { Quiz } from "../../types/quiz";
+import { ClassOut } from "../../types/class";
 
 interface ClassData extends ClassOut {
   quiz_count?: number;

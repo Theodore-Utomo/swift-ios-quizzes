@@ -9,6 +9,7 @@ import HomePage from './pages/Home';
 import ClassDetails from './pages/ClassDetails';
 import QuizPage from './pages/Quiz';
 import ProgressPage from './components/ProgressPage';
+import ErrorBoundary from './components/ErrorBoundary';
 import { UserProvider } from './contexts/UserContext';
 import { useAuth } from './hooks/useAuth';
 
@@ -65,9 +66,11 @@ const AppContent: React.FC = () => {
 
 function App() {
   return (
-    <UserProvider>
-      <AppContent />
-    </UserProvider>
+    <ErrorBoundary>
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
+    </ErrorBoundary>
   );
 }
 

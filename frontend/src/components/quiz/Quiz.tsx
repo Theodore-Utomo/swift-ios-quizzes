@@ -3,7 +3,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 import { Button } from "../ui/button";
 import { MarkdownRenderer } from "../ui/markdown-renderer";
 import { useUserApi } from "../../hooks/useUserApi";
-import { Quiz, QuestionType } from "../../types";
+import { Quiz, QuestionType } from "../../types/quiz";
+import { QuizProgressStatus } from "../../types/progress";
 
 interface QuizComponentProps {
   quiz: Quiz;
@@ -61,7 +62,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
       await userApi.submitMyQuizProgress(quiz.id, {
         current_question: 1,
         answers: selectedAnswers,
-        status: "completed",
+        status: QuizProgressStatus.COMPLETED,
         score: correctCount,
         total_questions: total,
         quiz_name: quiz.name,

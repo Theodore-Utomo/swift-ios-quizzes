@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
-import { Quiz, Question, QuestionType } from "../../types";
+import { Quiz, Question, QuestionType } from "../../types/quiz";
 
 interface QuizEditorProps {
   quiz: Quiz;

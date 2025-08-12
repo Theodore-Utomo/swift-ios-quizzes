@@ -1,42 +1,49 @@
-import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ClockIcon, CheckCircleIcon, XCircleIcon, PlayIcon } from "lucide-react";
-import { useUserApi } from "../hooks/useUserApi";
-import { QuizProgress } from "../types";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Badge } from './ui/badge';
+import { Skeleton } from './ui/skeleton';
+import { CheckCircleIcon, ClockIcon, PlayIcon, XCircleIcon } from 'lucide-react';
+import { QuizProgress, QuizProgressStatus } from "../types/progress";
+import { useUserApi } from '../hooks/useUserApi';
 
 interface QuizProgressListProps {}
 
 const QuizProgressList: React.FC<QuizProgressListProps> = () => {
   const [progressList, setProgressList] = useState<QuizProgress[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   const userApi = useUserApi();
 
-  const getStatusBadge = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'completed':
+  const getStatusBadge = (status: QuizProgressStatus) => {
+    switch (status) {
+      case QuizProgressStatus.COMPLETED:
         return (
           <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
             <CheckCircleIcon className="w-3 h-3 mr-1" />
             Completed
           </Badge>
         );
-      case 'in_progress':
+      case QuizProgressStatus.IN_PROGRESS:
         return (
           <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">
             <ClockIcon className="w-3 h-3 mr-1" />
             In Progress
           </Badge>
         );
-      case 'not_started':
+      case QuizProgressStatus.NOT_STARTED:
         return (
           <Badge variant="outline" className="bg-gray-100 text-gray-800 hover:bg-gray-200">
             <PlayIcon className="w-3 h-3 mr-1" />
             Not Started
+          </Badge>
+        );
+      case QuizProgressStatus.ABANDONED:
+        return (
+          <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-200">
+            <XCircleIcon className="w-3 h-3 mr-1" />
+            Abandoned
           </Badge>
         );
       default:

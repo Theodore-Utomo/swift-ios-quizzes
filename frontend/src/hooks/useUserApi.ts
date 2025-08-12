@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useAuth } from './useAuth';
 import { apiService, createUserApiService } from '../services/api';
-import { QuizProgressSubmission } from '../types';
+import { QuizProgressSubmission } from '../types/progress';
 
 /**
  * Hook that provides API methods with automatic user context handling

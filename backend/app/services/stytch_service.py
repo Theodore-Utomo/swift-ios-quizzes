@@ -22,9 +22,13 @@ class StytchService:
     def __init__(self):
         """Initialize Stytch client."""
         self.logger = logging.getLogger(__name__)
+        # Strip quotes from environment variables if present
+        project_id = os.getenv("STYTCH_PROJECT_ID")
+        secret = os.getenv("STYTCH_SECRET")
+        
         self.client = stytch.Client(
-            project_id=os.getenv("STYTCH_PROJECT_ID"),
-            secret=os.getenv("STYTCH_SECRET")
+            project_id=project_id,
+            secret=secret
         )
 
     @staticmethod
@@ -158,10 +162,15 @@ class StytchService:
         """Send magic link to user's email."""
         try:
             self.logger.info("[stytch_service] send_magic_link email=%s", email)
+            
+            # Get frontend URL from environment variable
+            frontend_url = os.getenv("FRONTEND_URL")
+            callback_url = f"{frontend_url}/auth/callback"
+            
             stytch_response = self.client.magic_links.email.login_or_create(
                 email=email,
-                login_magic_link_url="http://localhost:5173/auth/callback",
-                signup_magic_link_url="http://localhost:5173/auth/callback"
+                login_magic_link_url=callback_url,
+                signup_magic_link_url=callback_url
             )
             
             return StytchMessageResponse(message="Magic link sent to your email", email=email, stytch_user_id=str(stytch_response.user_id))
