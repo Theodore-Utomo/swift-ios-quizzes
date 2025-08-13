@@ -43,7 +43,7 @@ const Login: React.FC<LoginProps> = () => {
                 <Card>
                     <CardHeader className="space-y-1">
                         <CardTitle className="text-2xl font-bold text-center">
-                            Sign in to your account
+                            Sign in to Gallaugher's Quizzes
                         </CardTitle>
                         <CardDescription className="text-center">
                             Enter your email to receive a magic link

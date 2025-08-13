@@ -10,7 +10,7 @@ export default function Navbar({ onSignOut }: { onSignOut: () => void }) {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <Link to="/home" className="font-semibold tracking-tight">
-            Swift Quizzes
+            Gallaugher's Quizzes
           </Link>
           <div className="hidden md:flex items-center gap-1">
             <Button asChild variant="ghost" size="sm">
