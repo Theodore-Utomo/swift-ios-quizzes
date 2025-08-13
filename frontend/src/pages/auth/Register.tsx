@@ -43,7 +43,7 @@ const Register: React.FC = () => {
                 <Card>
                     <CardHeader className="space-y-1">
                         <CardTitle className="text-2xl font-bold text-center">
-                            Create your account
+                            Join Gallaugher's Quizzes
                         </CardTitle>
                         <CardDescription className="text-center">
                             Join the quiz platform and start learning
