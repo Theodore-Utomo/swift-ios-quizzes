@@ -12,7 +12,7 @@ router = APIRouter()
 async def create_class(body: ClassCreate, request: Request):
     """Create a new class. Requires instructor role."""
     user = await auth_middleware.require_instructor(request)
-    return await ClassService.create_class(body)
+    return await ClassService.create_record(body)
 
 
 @router.get("/", response_model=List[ClassOut])
@@ -26,7 +26,7 @@ async def list_classes(request: Request):
 async def get_class(class_id: str, request: Request):
     """Get a specific class by ID. Requires authentication."""
     user = await auth_middleware.require_auth(request)
-    return await ClassService.get_class(class_id)
+    return await ClassService.find_first_record(class_id)
 
 
 @router.put("/{class_id}", response_model=ClassOut)

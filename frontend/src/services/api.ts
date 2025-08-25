@@ -61,9 +61,8 @@ export const apiService = {
     updateQuiz: (classId: string, quizId: string, quiz: Quiz) => api.put<Quiz>(`/classes/${classId}/quizzes/${quizId}`, quiz),
     deleteQuiz: (classId: string, quizId: string) => api.delete(`/classes/${classId}/quizzes/${quizId}`),
 
-    // Quiz Progress (with explicit userId)
-    getQuizProgress: (userId: string) => api.get<QuizProgress[]>(`/quizzes/${userId}/quizProgress`),
-    submitQuizProgress: (userId: string, quizId: string, data: QuizProgressSubmission) => api.post<QuizProgress>(`/quizzes/${userId}/quizProgress/${quizId}`, data),
+    getQuizProgress: (userId: string) => api.get<QuizProgress[]>(`/QuizProgress/${userId}`),
+    submitQuizProgress: (userId: string, quizId: string, data: QuizProgressSubmission) => api.post<QuizProgress>(`/QuizProgress/${userId}/quizProgress/${quizId}`, data),
 
     // Auth (for AuthDebug component)
     authenticate: (data: AuthRequest) => api.post('/authenticate/', data),
