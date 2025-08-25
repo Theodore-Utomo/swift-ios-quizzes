@@ -54,12 +54,14 @@ export const apiService = {
     updateClass: (classId: string, data: ClassCreate) => api.put<ClassOut>(`/classes/${classId}`, data),
     deleteClass: (classId: string) => api.delete(`/classes/${classId}`),
 
-    // Quizzes
-    getClassQuizzes: (classId: string) => api.get<Quiz[]>(`/classes/${classId}/quizzes/`),
-    getQuiz: (classId: string, quizId: string) => api.get<Quiz>(`/classes/${classId}/quizzes/${quizId}`),
-    createQuiz: (classId: string, quiz: Quiz) => api.post<Quiz>(`/classes/${classId}/quizzes/`, quiz),
-    updateQuiz: (classId: string, quizId: string, quiz: Quiz) => api.put<Quiz>(`/classes/${classId}/quizzes/${quizId}`, quiz),
-    deleteQuiz: (classId: string, quizId: string) => api.delete(`/classes/${classId}/quizzes/${quizId}`),
+    // Quizzes 
+    getAllQuizzes: () => api.get<Quiz[]>('/quizzes/'),
+    getQuizById: (quizId: string) => api.get<Quiz>(`/quizzes/${quizId}`),
+    getClassQuizzes: (classId: string) => api.get<Quiz[]>(`/quizzes/classes/${classId}/quizzes`),
+    getQuiz: (classId: string, quizId: string) => api.get<Quiz>(`/quizzes/classes/${classId}/quizzes/${quizId}`),
+    createQuiz: (classId: string, quiz: Quiz) => api.post<Quiz>(`/quizzes/classes/${classId}/quizzes`, quiz),
+    updateQuiz: (classId: string, quizId: string, quiz: Quiz) => api.put<Quiz>(`/quizzes/classes/${classId}/quizzes/${quizId}`, quiz),
+    deleteQuiz: (classId: string, quizId: string) => api.delete(`/quizzes/classes/${classId}/quizzes/${quizId}`),
 
     getQuizProgress: (userId: string) => api.get<QuizProgress[]>(`/QuizProgress/${userId}`),
     submitQuizProgress: (userId: string, quizId: string, data: QuizProgressSubmission) => api.post<QuizProgress>(`/QuizProgress/${userId}/quizProgress/${quizId}`, data),

@@ -4,9 +4,7 @@ Quiz management routes.
 
 from fastapi import APIRouter, Request, HTTPException
 from typing import List
-from app.schemas.quiz import Quiz
 from app.schemas.quiz_progress import QuizProgress, QuizProgressSubmission
-from app.services.quiz_service import QuizService
 from app.services.quiz_progress_service import QuizProgressService
 from app.middleware.auth_middleware import auth_middleware
 
