@@ -11,53 +11,53 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import QuizEditor from "./QuizEditor";
 import { apiService } from "../../services/api";
 import { Quiz } from "../../types/quiz";
-import { ClassOut } from "../../types/class";
+import { CourseOut } from "../../types/course";
 
-interface ClassData extends ClassOut {
+interface CourseData extends CourseOut {
   quiz_count?: number;
 }
 
 const InstructorDashboard: React.FC = () => {
-  const [classes, setClasses] = useState<ClassData[]>([]);
-  const [selectedClass, setSelectedClass] = useState<ClassData | null>(null);
+  const [courses, setCourses] = useState<CourseData[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<CourseData | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [activeTab, setActiveTab] = useState("overview");
   
   // Dialog states
-  const [isCreateClassOpen, setIsCreateClassOpen] = useState(false);
-  const [isEditClassOpen, setIsEditClassOpen] = useState(false);
+  const [isCreateCourseOpen, setIsCreateCourseOpen] = useState(false);
+  const [isEditCourseOpen, setIsEditCourseOpen] = useState(false);
   const [isCreateQuizOpen, setIsCreateQuizOpen] = useState(false);
   const [isEditQuizOpen, setIsEditQuizOpen] = useState(false);
   
   // Form states
-  const [newClassName, setNewClassName] = useState("");
-  const [editClassName, setEditClassName] = useState("");
-  const [editingClass, setEditingClass] = useState<ClassData | null>(null);
+  const [newCourseName, setNewCourseName] = useState("");
+  const [editCourseName, setEditCourseName] = useState("");
+  const [editingCourse, setEditingCourse] = useState<CourseData | null>(null);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
   const [newQuizName, setNewQuizName] = useState("");
 
-  // Fetch classes
-  const fetchClasses = async () => {
+  // Fetch courses
+  const fetchCourses = async () => {
     try {
       setLoading(true);
-      const res = await apiService.getClasses();
+      const res = await apiService.getCourses();
       const data = res.data;
       
-      // Fetch quiz count for each class
-      const classesWithQuizCount = await Promise.all(
-        data.map(async (cls: ClassData) => {
+      // Fetch quiz count for each course
+      const coursesWithQuizCount = await Promise.all(
+        data.map(async (course: CourseData) => {
           try {
-            const quizRes = await apiService.getClassQuizzes(cls.class_id);
-            return { ...cls, quiz_count: quizRes.data.length };
+            const quizRes = await apiService.getCourseQuizzes(course.id);
+            return { ...course, quiz_count: quizRes.data.length };
           } catch {
-            return { ...cls, quiz_count: 0 };
+            return { ...course, quiz_count: 0 };
           }
         })
       );
       
-      setClasses(classesWithQuizCount);
+      setCourses(coursesWithQuizCount);
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -65,10 +65,10 @@ const InstructorDashboard: React.FC = () => {
     }
   };
 
-  // Fetch quizzes for selected class
-  const fetchQuizzes = async (classId: string) => {
+  // Fetch quizzes for selected course
+  const fetchQuizzes = async (courseId: string) => {
     try {
-      const res = await apiService.getClassQuizzes(classId);
+      const res = await apiService.getCourseQuizzes(courseId);
       setQuizzes(res.data);
     } catch (error: any) {
       setError(error.message);
@@ -76,56 +76,56 @@ const InstructorDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchClasses();
+    fetchCourses();
   }, []);
 
   useEffect(() => {
-    if (selectedClass) {
-      fetchQuizzes(selectedClass.class_id);
+    if (selectedCourse) {
+      fetchQuizzes(selectedCourse.id);
     }
-  }, [selectedClass]);
+  }, [selectedCourse]);
 
-  // Class handlers
-  const handleCreateClass = async () => {
-    if (!newClassName.trim()) return;
+  // Course handlers
+  const handleCreateCourse = async () => {
+    if (!newCourseName.trim()) return;
     
     try {
-      await apiService.createClass({ name: newClassName });
+      await apiService.createCourse({ name: newCourseName });
       
-      await fetchClasses();
-      setNewClassName("");
-      setIsCreateClassOpen(false);
+      await fetchCourses();
+      setNewCourseName("");
+      setIsCreateCourseOpen(false);
     } catch (error: any) {
       setError(error.message);
     }
   };
 
-  const handleEditClass = async () => {
-    if (!editingClass || !editClassName.trim()) return;
+  const handleEditCourse = async () => {
+    if (!editingCourse || !editCourseName.trim()) return;
     
     try {
-      await apiService.updateClass(editingClass.class_id, { name: editClassName });
+      await apiService.updateCourse(editingCourse.id, { name: editCourseName });
       
-      await fetchClasses();
-      setEditingClass(null);
-      setEditClassName("");
-      setIsEditClassOpen(false);
+      await fetchCourses();
+      setEditingCourse(null);
+      setEditCourseName("");
+      setIsEditCourseOpen(false);
       
-      if (selectedClass && selectedClass.class_id === editingClass.class_id) {
-        setSelectedClass({ ...editingClass, name: editClassName });
+      if (selectedCourse && selectedCourse.id === editingCourse.id) {
+        setSelectedCourse({ ...editingCourse, name: editCourseName });
       }
     } catch (error: any) {
       setError(error.message);
     }
   };
 
-  const handleDeleteClass = async (classId: string) => {
+  const handleDeleteCourse = async (courseId: string) => {
     try {
-      await apiService.deleteClass(classId);
+      await apiService.deleteCourse(courseId);
       
-      await fetchClasses();
-      if (selectedClass && selectedClass.class_id === classId) {
-        setSelectedClass(null);
+      await fetchCourses();
+      if (selectedCourse && selectedCourse.id === courseId) {
+        setSelectedCourse(null);
         setQuizzes([]);
       }
     } catch (error: any) {
@@ -135,13 +135,13 @@ const InstructorDashboard: React.FC = () => {
 
   // Quiz handlers
   const handleCreateQuiz = async (quiz: Quiz) => {
-    if (!selectedClass) return;
+    if (!selectedCourse) return;
     
     try {
-      await apiService.createQuiz(selectedClass.class_id, quiz);
+      await apiService.createQuiz(selectedCourse.id, quiz);
       
-      await fetchQuizzes(selectedClass.class_id);
-      await fetchClasses();
+      await fetchQuizzes(selectedCourse.id);
+      await fetchCourses();
       setIsCreateQuizOpen(false);
       setNewQuizName("");
     } catch (error: any) {
@@ -150,12 +150,12 @@ const InstructorDashboard: React.FC = () => {
   };
 
   const handleEditQuiz = async (quiz: Quiz) => {
-    if (!selectedClass) return;
+    if (!selectedCourse) return;
     
     try {
-      await apiService.updateQuiz(selectedClass.class_id, quiz.id, quiz);
+      await apiService.updateQuiz(selectedCourse.id, quiz.id, quiz);
       
-      await fetchQuizzes(selectedClass.class_id);
+      await fetchQuizzes(selectedCourse.id);
       setEditingQuiz(null);
       setIsEditQuizOpen(false);
     } catch (error: any) {
@@ -164,13 +164,13 @@ const InstructorDashboard: React.FC = () => {
   };
 
   const handleDeleteQuiz = async (quizId: string) => {
-    if (!selectedClass) return;
+    if (!selectedCourse) return;
     
     try {
-      await apiService.deleteQuiz(selectedClass.class_id, quizId);
+      await apiService.deleteQuiz(selectedCourse.id, quizId);
       
-      await fetchQuizzes(selectedClass.class_id);
-      await fetchClasses();
+      await fetchQuizzes(selectedCourse.id);
+      await fetchCourses();
     } catch (error: any) {
       setError(error.message);
     }
@@ -192,7 +192,7 @@ const InstructorDashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Instructor Dashboard</h1>
-          <p className="text-muted-foreground">Manage your classes and quizzes</p>
+          <p className="text-muted-foreground">Manage your courses and quizzes</p>
         </div>
       </div>
 
@@ -205,19 +205,19 @@ const InstructorDashboard: React.FC = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="classes">Manage Classes</TabsTrigger>
-          {selectedClass && <TabsTrigger value="quizzes">Manage Quizzes</TabsTrigger>}
+          <TabsTrigger value="courses">Manage Courses</TabsTrigger>
+          {selectedCourse && <TabsTrigger value="quizzes">Manage Quizzes</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Classes</CardTitle>
+                <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{classes.length}</div>
+                <div className="text-2xl font-bold">{courses.length}</div>
               </CardContent>
             </Card>
             <Card>
@@ -227,7 +227,7 @@ const InstructorDashboard: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {classes.reduce((sum, cls) => sum + (cls.quiz_count || 0), 0)}
+                  {courses.reduce((sum, course) => sum + (course.quiz_count || 0), 0)}
                 </div>
               </CardContent>
             </Card>
@@ -236,23 +236,23 @@ const InstructorDashboard: React.FC = () => {
           <div className="grid gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Recent Classes</CardTitle>
-                <CardDescription>Your most recently created classes</CardDescription>
+                <CardTitle>Recent Courses</CardTitle>
+                <CardDescription>Your most recently created courses</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {classes.slice(0, 5).map((cls) => (
-                    <div key={cls.class_id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md">
+                  {courses.slice(0, 5).map((course) => (
+                    <div key={course.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md">
                       <div className="flex items-center space-x-2">
                         <BookOpen className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">{cls.name}</span>
-                        <Badge variant="secondary">{cls.quiz_count || 0} quizzes</Badge>
+                        <span className="font-medium">{course.name}</span>
+                        <Badge variant="secondary">{course.quiz_count || 0} quizzes</Badge>
                       </div>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          setSelectedClass(cls);
+                          setSelectedCourse(course);
                           setActiveTab("quizzes");
                         }}
                       >
@@ -266,58 +266,58 @@ const InstructorDashboard: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="classes" className="space-y-4">
+        <TabsContent value="courses" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Classes</h2>
-            <Dialog open={isCreateClassOpen} onOpenChange={setIsCreateClassOpen}>
+            <h2 className="text-2xl font-bold">Courses</h2>
+            <Dialog open={isCreateCourseOpen} onOpenChange={setIsCreateCourseOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Class
+                  Create Course
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Create New Class</DialogTitle>
+                  <DialogTitle>Create New Course</DialogTitle>
                   <DialogDescription>
-                    Enter a name for your new class.
+                    Enter a name for your new course.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="className">Class Name</Label>
+                    <Label htmlFor="courseName">Course Name</Label>
                     <Input
-                      id="className"
-                      value={newClassName}
-                      onChange={(e) => setNewClassName(e.target.value)}
+                      id="courseName"
+                      value={newCourseName}
+                      onChange={(e) => setNewCourseName(e.target.value)}
                       placeholder="e.g., Introduction to Programming"
                     />
                   </div>
                 </div>
                 <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setIsCreateClassOpen(false)}>
+                  <Button variant="outline" onClick={() => setIsCreateCourseOpen(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleCreateClass}>Create Class</Button>
+                  <Button onClick={handleCreateCourse}>Create Course</Button>
                 </div>
               </DialogContent>
             </Dialog>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {classes.map((cls) => (
-              <Card key={cls.class_id} className="hover:shadow-md transition-shadow">
+            {courses.map((course) => (
+              <Card key={course.id} className="hover:shadow-md transition-shadow">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{cls.name}</CardTitle>
+                    <CardTitle className="text-lg">{course.name}</CardTitle>
                     <div className="flex space-x-1">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          setEditingClass(cls);
-                          setEditClassName(cls.name);
-                          setIsEditClassOpen(true);
+                          setEditingCourse(course);
+                          setEditCourseName(course.name);
+                          setIsEditCourseOpen(true);
                         }}
                       >
                         <Edit2 className="h-4 w-4" />
@@ -330,14 +330,14 @@ const InstructorDashboard: React.FC = () => {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Class</AlertDialogTitle>
+                            <AlertDialogTitle>Delete Course</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to delete "{cls.name}"? This action cannot be undone and will delete all associated quizzes.
+                              Are you sure you want to delete "{course.name}"? This action cannot be undone and will delete all associated quizzes.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteClass(cls.class_id)}>
+                            <AlertDialogAction onClick={() => handleDeleteCourse(course.id)}>
                               Delete
                             </AlertDialogAction>
                           </AlertDialogFooter>
@@ -346,7 +346,7 @@ const InstructorDashboard: React.FC = () => {
                     </div>
                   </div>
                   <CardDescription>
-                    <Badge variant="secondary">{cls.quiz_count || 0} quizzes</Badge>
+                    <Badge variant="secondary">{course.quiz_count || 0} quizzes</Badge>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -354,7 +354,7 @@ const InstructorDashboard: React.FC = () => {
                     className="w-full"
                     variant="outline"
                     onClick={() => {
-                      setSelectedClass(cls);
+                      setSelectedCourse(course);
                       setActiveTab("quizzes");
                     }}
                   >
@@ -365,40 +365,40 @@ const InstructorDashboard: React.FC = () => {
             ))}
           </div>
 
-          {/* Edit Class Dialog */}
-          <Dialog open={isEditClassOpen} onOpenChange={setIsEditClassOpen}>
+          {/* Edit Course Dialog */}
+          <Dialog open={isEditCourseOpen} onOpenChange={setIsEditCourseOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Edit Class</DialogTitle>
+                <DialogTitle>Edit Course</DialogTitle>
                 <DialogDescription>
-                  Update the name of your class.
+                  Update the name of your course.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="editClassName">Class Name</Label>
+                  <Label htmlFor="editCourseName">Course Name</Label>
                   <Input
-                    id="editClassName"
-                    value={editClassName}
-                    onChange={(e) => setEditClassName(e.target.value)}
+                    id="editCourseName"
+                    value={editCourseName}
+                    onChange={(e) => setEditCourseName(e.target.value)}
                   />
                 </div>
               </div>
               <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsEditClassOpen(false)}>
+                <Button variant="outline" onClick={() => setIsEditCourseOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleEditClass}>Save Changes</Button>
+                <Button onClick={handleEditCourse}>Save Changes</Button>
               </div>
             </DialogContent>
           </Dialog>
         </TabsContent>
 
-        {selectedClass && (
+        {selectedCourse && (
           <TabsContent value="quizzes" className="space-y-4">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-bold">Quizzes for {selectedClass.name}</h2>
+                <h2 className="text-2xl font-bold">Quizzes for {selectedCourse.name}</h2>
                 <p className="text-muted-foreground">{quizzes.length} quizzes</p>
               </div>
               <Dialog open={isCreateQuizOpen} onOpenChange={setIsCreateQuizOpen}>
@@ -412,7 +412,7 @@ const InstructorDashboard: React.FC = () => {
                   <DialogHeader>
                     <DialogTitle>Create New Quiz</DialogTitle>
                     <DialogDescription>
-                      Create a new quiz for {selectedClass.name}.
+                      Create a new quiz for {selectedCourse.name}.
                     </DialogDescription>
                   </DialogHeader>
                   <QuizEditor
@@ -487,7 +487,7 @@ const InstructorDashboard: React.FC = () => {
                   <DialogHeader>
                     <DialogTitle>Edit Quiz</DialogTitle>
                     <DialogDescription>
-                      Edit "{editingQuiz.name}" for {selectedClass.name}.
+                      Edit "{editingQuiz.name}" for {selectedCourse.name}.
                     </DialogDescription>
                   </DialogHeader>
                   <QuizEditor

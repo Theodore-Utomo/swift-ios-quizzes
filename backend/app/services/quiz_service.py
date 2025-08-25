@@ -3,84 +3,102 @@ Quiz management service.
 """
 
 from fastapi import HTTPException
-from typing import List, Optional
+from typing import List
 from app.schemas.quiz import Quiz
-from app.schemas.quiz_progress import QuizProgress
 from app.database import db
-from datetime import datetime
 
 
 class QuizService:
     """Service for quiz management operations."""
 
     @staticmethod
-    async def get_all_quizzes():
-        """Get all quizzes across all classes."""
+    def _get_quizzes_ref(course_id: str):
+        """Get quizzes collection reference for a course."""
+        return db.collection("courses").document(course_id).collection("quizzes")
+
+    @staticmethod
+    async def _verify_course_exists(course_id: str):
+        """Verify that a course exists."""
+        if not db.collection("courses").document(course_id).get().exists:
+            raise HTTPException(status_code=404, detail="Course not found")
+
+    @staticmethod
+    async def create_record(course_id: str, quiz: Quiz) -> Quiz:
+        """Create a new quiz in a course."""
+        await QuizService._verify_course_exists(course_id)
+        
+        quiz_doc = QuizService._get_quizzes_ref(course_id).document()
+        quiz_data = quiz.dict(exclude_unset=True)
+        quiz_data["id"] = quiz_doc.id
+        quiz_data["course_id"] = course_id  # Store course reference
+        
+        quiz_doc.set(quiz_data)
+        return Quiz(**quiz_data)
+
+    @staticmethod
+    async def find_first_record(course_id: str, quiz_id: str) -> Quiz:
+        """Get a specific quiz from a course."""
+        await QuizService._verify_course_exists(course_id)
+        
+        quiz_doc = QuizService._get_quizzes_ref(course_id).document(quiz_id)
+        quiz_snapshot = quiz_doc.get()
+        
+        if not quiz_snapshot.exists:
+            raise HTTPException(status_code=404, detail="Quiz not found")
+            
+        return Quiz(**quiz_snapshot.to_dict())
+
+    @staticmethod
+    async def list_quizzes_by_course(course_id: str) -> List[Quiz]:
+        """Get all quizzes for a specific course."""
+        await QuizService._verify_course_exists(course_id)
+        
+        return [
+            Quiz(**doc.to_dict())
+            for doc in QuizService._get_quizzes_ref(course_id).stream()
+        ]
+
+    @staticmethod
+    async def list_all_quizzes() -> List[Quiz]:
+        """Get all quizzes across all courses."""
         quizzes = []
-        classes = db.collection("classes").stream()
-        for cls in classes:
-            class_id = cls.id
-            quizzes.extend(
-                [
-                    Quiz(**doc.to_dict())
-                    for doc in db.collection("classes")
-                    .document(class_id)
-                    .collection("quizzes")
-                    .stream()
-                ]
-            )
+        courses = db.collection("courses").stream()
+        
+        for course in courses:
+            course_id = course.id
+            course_quizzes = [
+                Quiz(**doc.to_dict())
+                for doc in QuizService._get_quizzes_ref(course_id).stream()
+            ]
+            quizzes.extend(course_quizzes)
+            
         return quizzes
 
     @staticmethod
-    async def get_quiz_progress(user_id: str, quiz_id: str):
-        """Get quiz progress for a specific user and quiz."""
-        # Verify user exists
-        user_ref = db.collection("users").document(user_id)
-        if not user_ref.get().exists:
-            raise HTTPException(status_code=404, detail="User not found")
+    async def update_record(course_id: str, quiz_id: str, quiz: Quiz) -> Quiz:
+        """Update a quiz in a course."""
+        await QuizService._verify_course_exists(course_id)
+        
+        quiz_doc = QuizService._get_quizzes_ref(course_id).document(quiz_id)
+        if not quiz_doc.get().exists:
+            raise HTTPException(status_code=404, detail="Quiz not found")
 
-        progress_ref = user_ref.collection("quizProgress").document(quiz_id)
-        progress_doc = progress_ref.get()
-        if not progress_doc.exists:
-            raise HTTPException(status_code=404, detail="Quiz progress not found")
-
-        return progress_doc.to_dict()
-
-    @staticmethod
-    async def upload_quiz_progress(user_id: str, quiz_id: str, progress: QuizProgress):
-        """Upload quiz progress for a user."""
-        # Verify user exists
-        user_ref = db.collection("users").document(user_id)
-        if not user_ref.get().exists:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        # Reference the quiz progress document under the user's quizProgress subcollection.
-        progress_ref = user_ref.collection("quizProgress").document(quiz_id)
-
-        # Set timestamps: if 'started_at' isn't provided, use the current UTC time.
-        now = datetime.utcnow()
-        progress_data = progress.dict()
-        if not progress_data.get("started_at"):
-            progress_data["started_at"] = now
-        progress_data["updated_at"] = now
-        # Also, save the quiz_id inside the document.
-        progress_data["quiz_id"] = quiz_id
-
-        # Save the progress data to Firestore using merge so that you update existing entries.
-        progress_ref.set(progress_data, merge=True)
-        return progress_data
+        quiz_data = quiz.dict()
+        quiz_data["id"] = quiz_id
+        quiz_data["course_id"] = course_id
+        
+        quiz_doc.set(quiz_data)
+        return Quiz(**quiz_data)
 
     @staticmethod
-    async def list_quiz_progress(user_id: str):
-        """Get all quiz progress for a user."""
-        # Verify user exists
-        user_ref = db.collection("users").document(user_id)
-        if not user_ref.get().exists:
-            raise HTTPException(status_code=404, detail="User not found")
+    async def delete_record(course_id: str, quiz_id: str):
+        """Delete a quiz from a course."""
+        await QuizService._verify_course_exists(course_id)
+        
+        quiz_doc = QuizService._get_quizzes_ref(course_id).document(quiz_id)
+        if not quiz_doc.get().exists:
+            raise HTTPException(status_code=404, detail="Quiz not found")
 
-        progress_docs = user_ref.collection("quizProgress").stream()
-        # Add the document id (quiz_id) to the returned data.
-        return [
-            QuizProgress(**{**doc.to_dict(), "quiz_id": doc.id})
-            for doc in progress_docs
-        ]
+        quiz_doc.delete()
+        return
+

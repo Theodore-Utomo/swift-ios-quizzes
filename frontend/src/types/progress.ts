@@ -10,6 +10,7 @@ export enum QuizProgressStatus {
 }
 
 export interface QuizProgress {
+  id: string;
   quiz_id?: string;
   quiz_name?: string;
   current_question?: number;

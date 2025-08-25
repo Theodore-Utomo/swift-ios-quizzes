@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from app.routes import auth_routes as auth, classes_routes as classes, quizzes_routes as quizzes
+from app.routes import auth_routes as auth, course_routes as courses, quiz_progress_routes as quiz_progress, quiz_routes as quizzes
 from app.middleware.rate_limiting import limiter
 from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.request_logging import RequestLoggingMiddleware
@@ -175,5 +175,6 @@ async def health_check_simple():
 
 # Include routers
 app.include_router(auth.router, tags=["authentication"])
-app.include_router(classes.router, prefix="/classes", tags=["classes"])
+app.include_router(courses.router, prefix="/courses", tags=["courses"])
 app.include_router(quizzes.router, prefix="/quizzes", tags=["quizzes"])
+app.include_router(quiz_progress.router, prefix="/QuizProgress", tags=["quiz-progress"])

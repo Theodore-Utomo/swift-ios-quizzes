@@ -4,12 +4,12 @@ import { apiService } from "../services/api";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Quiz } from "../types/quiz";
-import { ClassOut } from "../types/class";
+import { CourseOut } from "../types/course";
 
-const ClassDetails: React.FC = () => {
-  const { classId } = useParams<{ classId: string }>();
+const CourseDetails: React.FC = () => {
+  const { courseId } = useParams<{ courseId: string }>();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [classInfo, setClassInfo] = useState<ClassOut | null>(null);
+  const [courseInfo, setCourseInfo] = useState<CourseOut | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
@@ -17,10 +17,10 @@ const ClassDetails: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const classRes = await apiService.getClass(classId!);
-        setClassInfo(classRes.data);
+        const courseRes = await apiService.getCourse(courseId!);
+        setCourseInfo(courseRes.data);
 
-        const quizzesRes = await apiService.getClassQuizzes(classId!);
+        const quizzesRes = await apiService.getCourseQuizzes(courseId!);
         setQuizzes(quizzesRes.data);
       } catch (err: any) {
         setError(err.message || "Something went wrong");
@@ -29,7 +29,7 @@ const ClassDetails: React.FC = () => {
       }
     };
     fetchData();
-  }, [classId]);
+  }, [courseId]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -39,10 +39,10 @@ const ClassDetails: React.FC = () => {
         </Button>
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {classInfo ? classInfo.name : "Class"}
+            {courseInfo ? courseInfo.name : "Course"}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Quizzes for this class
+            Quizzes for this course
           </p>
         </div>
       </div>
@@ -69,7 +69,7 @@ const ClassDetails: React.FC = () => {
         <Card className="border-destructive/40">
           <CardHeader>
             <CardTitle className="text-destructive">Failed to load</CardTitle>
-            <CardDescription>We couldn’t load this class or its quizzes.</CardDescription>
+            <CardDescription>We couldn't load this course or its quizzes.</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">{error}</p>
@@ -83,7 +83,7 @@ const ClassDetails: React.FC = () => {
           <CardHeader>
             <CardTitle>No quizzes yet</CardTitle>
             <CardDescription>
-              This class doesn’t have any quizzes yet.
+              This course doesn't have any quizzes yet.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -103,7 +103,7 @@ const ClassDetails: React.FC = () => {
               <CardFooter className="justify-end">
                 <Button
                   size="sm"
-                  onClick={() => navigate(`/classes/${classId}/quizzes/${quiz.id}`)}
+                  onClick={() => navigate(`/courses/${courseId}/quizzes/${quiz.id}`)}
                 >
                   Open quiz
                 </Button>
@@ -116,4 +116,4 @@ const ClassDetails: React.FC = () => {
   );
 };
 
-export default ClassDetails;
+export default CourseDetails;

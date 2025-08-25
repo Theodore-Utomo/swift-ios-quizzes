@@ -3,30 +3,30 @@ import { useNavigate } from "react-router-dom";
 import { apiService } from "../services/api";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { ClassOut } from "../types/class";
+import { CourseOut } from "../types/course";
 
 const HomePage: React.FC = () => {
-  const [classes, setClasses] = useState<ClassOut[]>([]);
+  const [courses, setCourses] = useState<CourseOut[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchClasses = async () => {
+    const fetchCourses = async () => {
       try {
-        const res = await apiService.getClasses();
-        setClasses(res.data);
+        const res = await apiService.getCourses();
+        setCourses(res.data);
       } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    fetchClasses();
+    fetchCourses();
   }, []);
 
-  const handleClassClick = (classId: string) => {
-    navigate(`/class/${classId}`);
+  const handleCourseClick = (courseId: string) => {
+    navigate(`/course/${courseId}`);
   };
 
   return (
@@ -62,13 +62,13 @@ const HomePage: React.FC = () => {
         <Card className="border-destructive/40">
           <CardHeader>
             <CardTitle className="text-destructive">Something went wrong</CardTitle>
-            <CardDescription>We couldn’t load the classes list.</CardDescription>
+            <CardDescription>We couldn't load the courses list.</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">{error}</p>
           </CardContent>
         </Card>
-      ) : classes.length === 0 ? (
+      ) : courses.length === 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>No courses yet</CardTitle>
@@ -79,10 +79,10 @@ const HomePage: React.FC = () => {
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {classes.map((cls) => (
-            <Card key={cls.class_id} className="group">
+          {courses.map((course) => (
+            <Card key={course.id} className="group">
               <CardHeader>
-                <CardTitle>{cls.name}</CardTitle>
+                <CardTitle>{course.name}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
@@ -90,7 +90,7 @@ const HomePage: React.FC = () => {
                 </p>
               </CardContent>
               <CardFooter className="justify-end">
-                <Button size="sm" onClick={() => handleClassClick(cls.class_id)}>
+                <Button size="sm" onClick={() => handleCourseClick(course.id)}>
                   View course
                 </Button>
               </CardFooter>
