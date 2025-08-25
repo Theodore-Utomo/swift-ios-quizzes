@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Quiz } from '../types/quiz';
-import { ClassCreate, ClassOut } from '../types/class';
+import { CourseCreate, CourseOut } from '../types/course';
 import { QuizProgress, QuizProgressSubmission } from '../types/progress';
 import { AuthRequest } from '../types/auth';
 
@@ -47,21 +47,21 @@ api.interceptors.response.use(
 );
 
 export const apiService = {
-    // Classes
-    getClasses: () => api.get<ClassOut[]>('/classes/'),
-    getClass: (classId: string) => api.get<ClassOut>(`/classes/${classId}`),
-    createClass: (data: ClassCreate) => api.post<ClassOut>('/classes/', data),
-    updateClass: (classId: string, data: ClassCreate) => api.put<ClassOut>(`/classes/${classId}`, data),
-    deleteClass: (classId: string) => api.delete(`/classes/${classId}`),
+    // Courses
+    getCourses: () => api.get<CourseOut[]>('/courses/'),
+    getCourse: (courseId: string) => api.get<CourseOut>(`/courses/${courseId}`),
+    createCourse: (data: CourseCreate) => api.post<CourseOut>('/courses/', data),
+    updateCourse: (courseId: string, data: CourseCreate) => api.put<CourseOut>(`/courses/${courseId}`, data),
+    deleteCourse: (courseId: string) => api.delete(`/courses/${courseId}`),
 
     // Quizzes 
     getAllQuizzes: () => api.get<Quiz[]>('/quizzes/'),
     getQuizById: (quizId: string) => api.get<Quiz>(`/quizzes/${quizId}`),
-    getClassQuizzes: (classId: string) => api.get<Quiz[]>(`/quizzes/classes/${classId}/quizzes`),
-    getQuiz: (classId: string, quizId: string) => api.get<Quiz>(`/quizzes/classes/${classId}/quizzes/${quizId}`),
-    createQuiz: (classId: string, quiz: Quiz) => api.post<Quiz>(`/quizzes/classes/${classId}/quizzes`, quiz),
-    updateQuiz: (classId: string, quizId: string, quiz: Quiz) => api.put<Quiz>(`/quizzes/classes/${classId}/quizzes/${quizId}`, quiz),
-    deleteQuiz: (classId: string, quizId: string) => api.delete(`/quizzes/classes/${classId}/quizzes/${quizId}`),
+    getCourseQuizzes: (courseId: string) => api.get<Quiz[]>(`/quizzes/courses/${courseId}/quizzes`),
+    getQuiz: (courseId: string, quizId: string) => api.get<Quiz>(`/quizzes/courses/${courseId}/quizzes/${quizId}`),
+    createQuiz: (courseId: string, quiz: Quiz) => api.post<Quiz>(`/quizzes/courses/${courseId}/quizzes`, quiz),
+    updateQuiz: (courseId: string, quizId: string, quiz: Quiz) => api.put<Quiz>(`/quizzes/courses/${courseId}/quizzes/${quizId}`, quiz),
+    deleteQuiz: (courseId: string, quizId: string) => api.delete(`/quizzes/courses/${courseId}/quizzes/${quizId}`),
 
     getQuizProgress: (userId: string) => api.get<QuizProgress[]>(`/QuizProgress/${userId}`),
     submitQuizProgress: (userId: string, quizId: string, data: QuizProgressSubmission) => api.post<QuizProgress>(`/QuizProgress/${userId}/quizProgress/${quizId}`, data),
