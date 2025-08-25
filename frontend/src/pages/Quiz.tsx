@@ -5,7 +5,7 @@ import { Quiz } from '../types/quiz';
 import { apiService } from "../services/api";
 
 const QuizPage: React.FC = () => {
-  const { classId, quizId } = useParams<{ classId: string; quizId: string }>();
+  const { courseId, quizId } = useParams<{ courseId: string; quizId: string }>();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +13,7 @@ const QuizPage: React.FC = () => {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const response = await apiService.getQuiz(classId!, quizId!);
+        const response = await apiService.getQuiz(courseId!, quizId!);
         setQuiz(response.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -23,7 +23,7 @@ const QuizPage: React.FC = () => {
     };
 
     fetchQuiz();
-  }, [classId, quizId]);
+  }, [courseId, quizId]);
 
   if (loading) return <p>Loading quiz...</p>;
   if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
