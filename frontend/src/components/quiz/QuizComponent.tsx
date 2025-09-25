@@ -72,7 +72,6 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
     }
 
   };
-
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <Card>
@@ -83,8 +82,11 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
         <CardContent className="space-y-6">
           {quiz.content.map((q) => (
             <div key={q.question_number} className="space-y-3">
-              <div className="font-medium">
-                <MarkdownRenderer content={q.question_text} />
+              <div className="font-medium flex items-start gap-2">
+                <span className="text-primary font-semibold">{q.question_number}.</span>
+                <div className="flex-1">
+                  <MarkdownRenderer content={q.question_text} />
+                </div>
               </div>
               <div className="space-y-2">
                 {(q.question_type === QuestionType.MCQ || q.question_type === QuestionType.MULTIPLE_ANSWER) && (
