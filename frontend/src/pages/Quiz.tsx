@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import QuizComponent from '../components/quiz/Quiz';
+import QuizComponent from '../components/quiz/QuizComponent';
 import { Quiz } from '../types/quiz';
 import { apiService } from "../services/api";
 
