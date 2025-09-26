@@ -319,7 +319,7 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
                             if (Array.isArray(question.question_answer)) {
                               currentAnswers = question.question_answer;
                             } else if (typeof question.question_answer === "string") {
-                              // For legacy comma-separated format or new users
+                              // For legacy comma-separated format
                               if (question.question_answer.startsWith('[') && question.question_answer.endsWith(']')) {
                                 try {
                                   currentAnswers = JSON.parse(question.question_answer);
