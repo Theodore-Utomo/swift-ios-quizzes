@@ -109,9 +109,35 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
       }
 
       if (question.question_type === QuestionType.MCQ || question.question_type === QuestionType.MULTIPLE_ANSWER) {
-        const answerArray = typeof question.question_answer === "string" 
-          ? question.question_answer.split(", ").filter(a => a.trim())
-          : question.question_answer;
+        let answerArray: string[];
+        
+        if (question.question_type === QuestionType.MCQ) {
+          // For MCQ, answer should be a single string
+          answerArray = typeof question.question_answer === "string" 
+            ? [question.question_answer].filter(a => a.trim())
+            : Array.isArray(question.question_answer) 
+            ? question.question_answer
+            : [];
+        } else {
+          // For MULTIPLE_ANSWER, handle both array and string formats
+          if (Array.isArray(question.question_answer)) {
+            answerArray = question.question_answer;
+          } else if (typeof question.question_answer === "string") {
+            // Check if it looks like JSON array format
+            if (question.question_answer.startsWith('[') && question.question_answer.endsWith(']')) {
+              try {
+                answerArray = JSON.parse(question.question_answer);
+              } catch {
+                answerArray = [];
+              }
+            } else {
+              // Fallback for legacy comma-separated format
+              answerArray = question.question_answer ? question.question_answer.split(", ").filter(a => a.trim()) : [];
+            }
+          } else {
+            answerArray = [];
+          }
+        }
         
         const invalidAnswers = answerArray.filter(answer => !question.question_options.includes(answer));
         if (invalidAnswers.length > 0) {
@@ -289,11 +315,23 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
                           <p className="text-sm text-muted-foreground">Add answer options first</p>
                         ) : (
                           question.question_options.map((option) => {
-                            const currentAnswers = Array.isArray(question.question_answer) 
-                              ? question.question_answer 
-                              : typeof question.question_answer === "string" 
-                                ? question.question_answer.split(", ").filter(a => a.trim()) 
-                                : [];
+                            let currentAnswers: string[];
+                            if (Array.isArray(question.question_answer)) {
+                              currentAnswers = question.question_answer;
+                            } else if (typeof question.question_answer === "string") {
+                              // For legacy comma-separated format or new users
+                              if (question.question_answer.startsWith('[') && question.question_answer.endsWith(']')) {
+                                try {
+                                  currentAnswers = JSON.parse(question.question_answer);
+                                } catch {
+                                  currentAnswers = [];
+                                }
+                              } else {
+                                currentAnswers = question.question_answer ? question.question_answer.split(", ").filter(a => a.trim()) : [];
+                              }
+                            } else {
+                              currentAnswers = [];
+                            }
                             const isChecked = currentAnswers.includes(option);
                             
                             return (
@@ -308,7 +346,7 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
                                     } else {
                                       newAnswers = currentAnswers.filter(a => a !== option);
                                     }
-                                    handleQuestionChange(index, "question_answer", newAnswers.join(", "));
+                                    handleQuestionChange(index, "question_answer", newAnswers);
                                   }}
                                 />
                                 <Label 
@@ -327,7 +365,9 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
                         value={
                           typeof question.question_answer === "string"
                             ? question.question_answer
-                            : (question.question_answer as string[]).join(", ")
+                            : Array.isArray(question.question_answer)
+                            ? question.question_answer.join(", ")
+                            : ""
                         }
                         onChange={(e) =>
                           handleQuestionChange(index, "question_answer", e.target.value)
