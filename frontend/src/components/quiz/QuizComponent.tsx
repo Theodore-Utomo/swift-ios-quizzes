@@ -33,10 +33,27 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
       if (question.question_type === QuestionType.MCQ) {
         newResults[question.question_number] = userAnswer === correctAnswer;
       } else if (question.question_type === QuestionType.MULTIPLE_ANSWER) {
+        let correctAnswerArray: string[];
+        if (Array.isArray(correctAnswer)) {
+          correctAnswerArray = correctAnswer;
+        } else if (typeof correctAnswer === "string") {
+          if (correctAnswer.startsWith('[') && correctAnswer.endsWith(']')) {
+            try {
+              correctAnswerArray = JSON.parse(correctAnswer);
+            } catch {
+              correctAnswerArray = correctAnswer.split(", ").filter(a => a.trim());
+            }
+          } else {
+            correctAnswerArray = correctAnswer ? correctAnswer.split(", ").filter(a => a.trim()) : [];
+          }
+        } else {
+          correctAnswerArray = [];
+        }
+
         newResults[question.question_number] =
           Array.isArray(userAnswer) &&
-          userAnswer.length === (correctAnswer as string[]).length &&
-          userAnswer.every((ans) => (correctAnswer as string[]).includes(ans));
+          userAnswer.length === correctAnswerArray.length &&
+          userAnswer.every((ans) => correctAnswerArray.includes(ans));
       } else if (question.question_type === QuestionType.SHORT_ANSWER) {
         if (typeof userAnswer === "string") {
           if (Array.isArray(correctAnswer)) {

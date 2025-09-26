@@ -1,12 +1,12 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict, Optional, Union, List
 from .quiz_progress_status_enum import QuizProgressStatus
 
 
 class QuizProgressSubmission(BaseModel):
     current_question: int
-    answers: Dict[str, str] = {}  
+    answers: Dict[str, Union[str, List[str]]] = {}  
     status: QuizProgressStatus
     score: Optional[int] = None
     total_questions: Optional[int] = None
@@ -16,7 +16,7 @@ class QuizProgressSubmission(BaseModel):
 class QuizProgress(BaseModel):
     id: str
     current_question: int
-    answers: Dict[str, str] = {}  
+    answers: Dict[str, Union[str, List[str]]] = {}  
     status: QuizProgressStatus
     score: Optional[int] = None
     total_questions: Optional[int] = None
