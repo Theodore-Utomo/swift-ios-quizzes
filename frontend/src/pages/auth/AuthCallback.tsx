@@ -12,12 +12,10 @@ const AuthCallback: React.FC<AuthCallbackProps> = ({ onLogin }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const hasRunRef = useRef(false);
+  const processingTokensRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const handleCallback = async () => {
-      if (hasRunRef.current) return;
-      hasRunRef.current = true;
-
       const token = searchParams.get('token');
 
       if (!token) {
@@ -50,13 +48,29 @@ const AuthCallback: React.FC<AuthCallbackProps> = ({ onLogin }) => {
         // Replace history so a refresh doesn't reuse the one-time token
         navigate('/home', { replace: true });
       } catch (err: any) {
-        setError(err?.message || 'Authentication failed. Please try again.');
+        const errorMessage = err?.message || 'Authentication failed. Please try again.';
+        console.error('[AuthCallback] Error verifying magic link:', errorMessage);
+
+        const isTokenAlreadyUsed = errorMessage.toLowerCase().includes('already used') ||
+          errorMessage.toLowerCase().includes('expired') ||
+          errorMessage.toLowerCase().includes('unable_to_auth_magic_link');
+
+        if (!isTokenAlreadyUsed) {
+          // For other errors, allow retry by clearing the processed flag
+          processingTokensRef.current.delete(token);
+          const processedKey = `auth_token_processed_${token}`;
+          sessionStorage.removeItem(processedKey);
+          hasRunRef.current = false;
+        }
+
+        setError(errorMessage);
         setLoading(false);
       }
     };
 
     handleCallback();
-  }, [searchParams, navigate, onLogin]);
+
+  }, [searchParams, navigate]);
 
   if (loading) {
     return (

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import InstructorDashboard from './components/instructor/InstructorDashboard';
 import Navbar from './components/layout/Navbar';
@@ -13,9 +13,17 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { UserProvider } from './contexts/UserContext';
 import { useAuth } from './hooks/useAuth';
 
-// App content component that uses the UserContext
 const AppContent: React.FC = () => {
   const { isAuthenticated, loading, login, logout } = useAuth();
+
+  const handleLogin = useCallback(async (sessionToken: string) => {
+    try {
+      await login(sessionToken);
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  }, [login]);
 
   if (loading) {
     return (
@@ -27,16 +35,6 @@ const AppContent: React.FC = () => {
       </div>
     );
   }
-
-  const handleLogin = async (sessionToken: string) => {
-    try {
-      await login(sessionToken);
-    } catch (error) {
-      console.error('Login failed:', error);
-      // The error will be handled by the login components
-      throw error;
-    }
-  };
 
   return (
     <Router>

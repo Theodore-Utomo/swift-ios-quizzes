@@ -82,12 +82,7 @@ class StytchService:
             # Handle response - it's a CreateResponse object
             stytch_user_id = stytch_response.user_id
             
-            # Get role value safely
-            role_value = "student"  # Always default to student
-            if hasattr(user.role, 'value'):
-                role_value = user.role.value
-            elif hasattr(user.role, 'name'):
-                role_value = user.role.name.lower()
+            role_value = "student"  
             
             # Check if user already exists
             existing_user = self._find_user_by_email(user.email)
