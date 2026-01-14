@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from app.routes import auth_routes as auth, course_routes as courses, quiz_progress_routes as quiz_progress, quiz_routes as quizzes
+from app.routes import auth_routes as auth, course_routes as courses, quiz_progress_routes as quiz_progress, quiz_routes as quizzes, feedback_routes as feedback
 from app.middleware.rate_limiting import limiter
 from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.request_logging import RequestLoggingMiddleware
@@ -178,3 +178,4 @@ app.include_router(auth.router, tags=["authentication"])
 app.include_router(courses.router, prefix="/courses", tags=["courses"])
 app.include_router(quizzes.router, prefix="/quizzes", tags=["quizzes"])
 app.include_router(quiz_progress.router, prefix="/QuizProgress", tags=["quiz-progress"])
+app.include_router(feedback.router, prefix="/feedback", tags=["feedback"])

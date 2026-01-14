@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import InstructorDashboard from './components/instructor/InstructorDashboard';
 import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import AuthCallback from './pages/auth/AuthCallback';
@@ -40,18 +41,21 @@ const AppContent: React.FC = () => {
   return (
     <Router>
       {isAuthenticated ? (
-        <>
+        <div className="flex flex-col min-h-screen">
           <Navbar onSignOut={logout} />
-          <Routes>
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/instructor-panel" element={<InstructorDashboard />} />
-            <Route path="/course/:courseId" element={<CourseDetails />} />
-            <Route path="/courses/:courseId/quizzes/:quizId" element={<QuizPage />} />
-            <Route path="/courses/:courseId/quizzes/:quizId/results" element={<QuizResultsPage />} />
-            <Route path="/progress" element={<ProgressPage />} />
-            <Route path="*" element={<Navigate to="/home" />} />
-          </Routes>
-        </>
+          <main className="flex-1">
+            <Routes>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/instructor-panel" element={<InstructorDashboard />} />
+              <Route path="/course/:courseId" element={<CourseDetails />} />
+              <Route path="/courses/:courseId/quizzes/:quizId" element={<QuizPage />} />
+              <Route path="/courses/:courseId/quizzes/:quizId/results" element={<QuizResultsPage />} />
+              <Route path="/progress" element={<ProgressPage />} />
+              <Route path="*" element={<Navigate to="/home" />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
       ) : (
         <Routes>
           <Route path="/login" element={<Login onLogin={handleLogin} />} />

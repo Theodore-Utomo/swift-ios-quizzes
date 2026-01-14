@@ -68,6 +68,13 @@ export const apiService = {
 
     // Auth (for AuthDebug component)
     authenticate: (data: AuthRequest) => api.post('/authenticate/', data),
+
+    // Feedback
+    submitFeedback: (feedbackBody: string, userId: string) => api.post('/feedback/', {
+        feedback_body: feedbackBody,
+        submitted_at: new Date().toISOString(),
+        user_id: userId,
+    }),
 };
 
 
