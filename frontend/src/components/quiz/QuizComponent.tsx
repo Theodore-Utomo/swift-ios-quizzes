@@ -158,7 +158,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
                 </p>
               )}
               {score !== null && q.question_hint && (
-                <p className="text-muted-foreground text-sm">Hint: {q.question_hint}</p>
+                <p className="text-muted-foreground text-sm">Feedback: {q.question_hint}</p>
               )}
             </div>
           ))}

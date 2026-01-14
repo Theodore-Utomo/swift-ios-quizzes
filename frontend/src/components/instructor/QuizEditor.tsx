@@ -377,15 +377,14 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
                     )}
                   </div>
 
-                  {/* Hint */}
                   <div className="space-y-2">
-                    <Label>Hint (Optional)</Label>
+                    <Label>Feedback (Optional)</Label>
                     <Input
                       value={question.question_hint}
                       onChange={(e) =>
                         handleQuestionChange(index, "question_hint", e.target.value)
                       }
-                      placeholder="Provide a helpful hint..."
+                      placeholder="Provide helpful feedback..."
                     />
                   </div>
                 </CardContent>
