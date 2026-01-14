@@ -31,7 +31,7 @@ const QuizPage: React.FC = () => {
 
   return (
     <div>
-      <QuizComponent quiz={quiz} />
+      <QuizComponent quiz={quiz} courseId={courseId!} />
     </div>
   );
 };

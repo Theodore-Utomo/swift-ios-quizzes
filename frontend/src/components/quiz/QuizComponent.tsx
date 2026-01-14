@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { Button } from "../ui/button";
 import { MarkdownRenderer } from "../ui/markdown-renderer";
@@ -8,30 +9,36 @@ import { QuizProgressStatus } from "../../types/progress";
 
 interface QuizComponentProps {
   quiz: Quiz;
+  courseId: string;
 }
 
-export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
+export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, courseId }) => {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string | string[]>>({});
-  const [results, setResults] = useState<Record<number, boolean>>({});
   const [score, setScore] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const total = quiz.content.length;
   
   const userApi = useUserApi();
+  const navigate = useNavigate();
 
   const handleAnswerSelect = (questionNumber: number, answer: string | string[]) => {
     setSelectedAnswers((prev) => ({ ...prev, [questionNumber]: answer }));
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
+    
     let correctCount = 0;
-    const newResults: Record<number, boolean> = {};
+    const results: Record<number, boolean> = {};
 
     quiz.content.forEach((question) => {
       const userAnswer = selectedAnswers[question.question_number];
       const correctAnswer = question.question_answer;
+      let isCorrect = false;
 
       if (question.question_type === QuestionType.MCQ) {
-        newResults[question.question_number] = userAnswer === correctAnswer;
+        isCorrect = userAnswer === correctAnswer;
+        if (isCorrect) correctCount++;
       } else if (question.question_type === QuestionType.MULTIPLE_ANSWER) {
         let correctAnswerArray: string[];
         if (Array.isArray(correctAnswer)) {
@@ -50,29 +57,25 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
           correctAnswerArray = [];
         }
 
-        newResults[question.question_number] =
+        isCorrect =
           Array.isArray(userAnswer) &&
           userAnswer.length === correctAnswerArray.length &&
           userAnswer.every((ans) => correctAnswerArray.includes(ans));
+        if (isCorrect) correctCount++;
       } else if (question.question_type === QuestionType.SHORT_ANSWER) {
         if (typeof userAnswer === "string") {
           if (Array.isArray(correctAnswer)) {
-            newResults[question.question_number] = correctAnswer.some(
-              (correct) => correct.toLowerCase() === userAnswer.toLowerCase()
-            );
+            isCorrect = correctAnswer.some((correct) => correct.toLowerCase() === userAnswer.toLowerCase());
           } else {
-            newResults[question.question_number] =
-              correctAnswer.toLowerCase() === userAnswer.toLowerCase();
+            isCorrect = correctAnswer.toLowerCase() === userAnswer.toLowerCase();
           }
-        } else {
-          newResults[question.question_number] = false;
+          if (isCorrect) correctCount++;
         }
       }
 
-      if (newResults[question.question_number]) correctCount++;
+      results[question.question_number] = isCorrect;
     });
 
-    setResults(newResults);
     setScore(correctCount);
 
     try {
@@ -88,7 +91,32 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
       console.log(error);
     }
 
+    navigate(`/courses/${courseId}/quizzes/${quiz.id}/results`, {
+      state: {
+        quiz,
+        selectedAnswers,
+        results,
+        score: correctCount,
+        total,
+        courseId,
+      },
+    });
   };
+
+  if (isSubmitting) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-8">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <p className="text-lg font-medium">Submitting your answers...</p>
+            <p className="text-sm text-muted-foreground mt-2">Please wait while we process your quiz.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <Card>
@@ -152,14 +180,6 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
                   />
                 )}
               </div>
-              {results[q.question_number] !== undefined && (
-                <p className={results[q.question_number] ? "text-green-600" : "text-destructive"}>
-                  {results[q.question_number] ? "Correct!" : "Incorrect!"}
-                </p>
-              )}
-              {score !== null && q.question_hint && (
-                <p className="text-muted-foreground text-sm">Feedback: {q.question_hint}</p>
-              )}
             </div>
           ))}
         </CardContent>
@@ -167,7 +187,9 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz }) => {
           <span className="text-sm text-muted-foreground">
             {score !== null ? `Score: ${score} / ${total}` : `${total} question(s)`}
           </span>
-          <Button onClick={handleSubmit}>Submit Answers</Button>
+          <Button onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit Answers"}
+          </Button>
         </CardFooter>
       </Card>
     </div>

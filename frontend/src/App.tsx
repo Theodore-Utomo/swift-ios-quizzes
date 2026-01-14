@@ -8,6 +8,7 @@ import AuthCallback from './pages/auth/AuthCallback';
 import HomePage from './pages/Home';
 import CourseDetails from './pages/CourseDetails';
 import QuizPage from './pages/Quiz';
+import QuizResultsPage from './pages/QuizResults';
 import ProgressPage from './components/ProgressPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import { UserProvider } from './contexts/UserContext';
@@ -46,6 +47,7 @@ const AppContent: React.FC = () => {
             <Route path="/instructor-panel" element={<InstructorDashboard />} />
             <Route path="/course/:courseId" element={<CourseDetails />} />
             <Route path="/courses/:courseId/quizzes/:quizId" element={<QuizPage />} />
+            <Route path="/courses/:courseId/quizzes/:quizId/results" element={<QuizResultsPage />} />
             <Route path="/progress" element={<ProgressPage />} />
             <Route path="*" element={<Navigate to="/home" />} />
           </Routes>
