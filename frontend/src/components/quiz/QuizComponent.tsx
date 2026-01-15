@@ -146,7 +146,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, courseId }) 
                       return (
                         <label
                           key={option}
-                          className="flex items-center gap-2 rounded-md border p-2 hover:bg-accent"
+                          className="flex items-start gap-2 rounded-md border p-2 hover:bg-accent cursor-pointer"
                         >
                           <input
                             type={isMulti ? "checkbox" : "radio"}
@@ -164,8 +164,11 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({ quiz, courseId }) 
                                 handleAnswerSelect(q.question_number, updated);
                               }
                             }}
+                            className="mt-1"
                           />
-                          <span>{option}</span>
+                          <div className="flex-1">
+                            <MarkdownRenderer content={option} />
+                          </div>
                         </label>
                       );
                     })}

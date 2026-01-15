@@ -252,36 +252,55 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
                   {(question.question_type === QuestionType.MCQ || question.question_type === QuestionType.MULTIPLE_ANSWER) && (
                     <div className="space-y-2">
                       <Label>Answer Options</Label>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {question.question_options.map((option, optionIndex) => (
-                          <div key={optionIndex} className="flex items-center space-x-2">
-                            <Input value={option} readOnly className="flex-1" />
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRemoveOption(index, optionIndex)}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                            </Button>
+                          <div key={optionIndex} className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <Label className="text-sm text-muted-foreground">Option {optionIndex + 1}</Label>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRemoveOption(index, optionIndex)}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </div>
+                            <MarkdownEditor
+                              value={option}
+                              onChange={(value) => {
+                                const updatedQuestions = [...editedQuiz.content];
+                                const question = updatedQuestions[index];
+                                question.question_options[optionIndex] = value;
+                                setEditedQuiz({ ...editedQuiz, content: updatedQuestions });
+                              }}
+                              placeholder="Enter answer option... (Supports Markdown)"
+                              rows={2}
+                              compact={true}
+                            />
                           </div>
                         ))}
-                        <div className="flex items-start space-x-2">
-                          <Textarea
-                            value={newOptions[index] || ""}
-                            onChange={(e) =>
-                              setNewOptions((prev) => ({ ...prev, [index]: e.target.value }))
-                            }
-                            placeholder="Add new option... (Supports line breaks)"
-                            className="flex-1 min-h-[60px]"
-                            rows={2}
-                          />
-                          <Button
-                            onClick={() => handleAddOption(index)}
-                            disabled={!newOptions[index]?.trim()}
-                            className="mt-1"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
+                        <div className="space-y-1">
+                          <Label className="text-sm text-muted-foreground">Add New Option</Label>
+                          <div className="flex items-start space-x-2">
+                            <div className="flex-1">
+                              <MarkdownEditor
+                                value={newOptions[index] || ""}
+                                onChange={(value) =>
+                                  setNewOptions((prev) => ({ ...prev, [index]: value }))
+                                }
+                                placeholder="Add new option... (Supports Markdown)"
+                                rows={2}
+                                compact={true}
+                              />
+                            </div>
+                            <Button
+                              onClick={() => handleAddOption(index)}
+                              disabled={!newOptions[index]?.trim()}
+                              className="mt-1"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
