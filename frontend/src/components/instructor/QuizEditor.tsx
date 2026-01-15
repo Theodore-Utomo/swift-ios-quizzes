@@ -3,6 +3,7 @@ import { Plus, Trash2, Save, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -264,18 +265,20 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
                             </Button>
                           </div>
                         ))}
-                        <div className="flex items-center space-x-2">
-                          <Input
+                        <div className="flex items-start space-x-2">
+                          <Textarea
                             value={newOptions[index] || ""}
                             onChange={(e) =>
                               setNewOptions((prev) => ({ ...prev, [index]: e.target.value }))
                             }
-                            placeholder="Add new option..."
-                            className="flex-1"
+                            placeholder="Add new option... (Supports line breaks)"
+                            className="flex-1 min-h-[60px]"
+                            rows={2}
                           />
                           <Button
                             onClick={() => handleAddOption(index)}
                             disabled={!newOptions[index]?.trim()}
+                            className="mt-1"
                           >
                             <Plus className="h-4 w-4" />
                           </Button>
@@ -361,7 +364,7 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
                         )}
                       </div>
                     ) : (
-                      <Input
+                      <Textarea
                         value={
                           typeof question.question_answer === "string"
                             ? question.question_answer
@@ -372,19 +375,21 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, onSave, onCancel, isNew }
                         onChange={(e) =>
                           handleQuestionChange(index, "question_answer", e.target.value)
                         }
-                        placeholder="Expected answer"
+                        placeholder="Expected answer (Supports line breaks)"
+                        rows={3}
                       />
                     )}
                   </div>
 
                   <div className="space-y-2">
                     <Label>Feedback (Optional)</Label>
-                    <Input
-                      value={question.question_hint}
-                      onChange={(e) =>
-                        handleQuestionChange(index, "question_hint", e.target.value)
+                    <MarkdownEditor
+                      value={question.question_hint || ""}
+                      onChange={(value) =>
+                        handleQuestionChange(index, "question_hint", value)
                       }
-                      placeholder="Provide helpful feedback..."
+                      placeholder="Provide helpful feedback... (Supports Markdown and line breaks)"
+                      rows={3}
                     />
                   </div>
                 </CardContent>

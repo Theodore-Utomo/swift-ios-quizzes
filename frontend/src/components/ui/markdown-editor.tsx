@@ -73,22 +73,26 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                   rehypePlugins={[rehypeHighlight, rehypeRaw]}
                   components={{
                     // Custom styling for code blocks
-                    code({ node, className, children, ...props }) {
+                    code({ node, className, children, ...props }: any) {
                       const match = /language-(\w+)/.exec(className || '');
-                      const inline = !className?.includes('language-');
-                      return !inline && match ? (
-                        <pre className="bg-muted p-3 rounded-md overflow-x-auto">
-                          <code className={className} {...props}>
-                            {children}
-                          </code>
-                        </pre>
-                      ) : (
-                        <code className="bg-muted px-1 py-0.5 rounded text-sm" {...props}>
+                      const isBlockCode = className?.includes('language-') && match;
+                      
+                      if (isBlockCode) {
+                        return (
+                          <pre className="bg-muted p-3 rounded-md overflow-x-auto">
+                            <code className={className} {...props}>
+                              {children}
+                            </code>
+                          </pre>
+                        );
+                      }
+                      
+                      return (
+                        <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
                           {children}
                         </code>
                       );
                     },
-                    // Custom styling for blockquotes
                     blockquote({ children }) {
                       return (
                         <blockquote className="border-l-4 border-blue-500 pl-4 italic text-muted-foreground">

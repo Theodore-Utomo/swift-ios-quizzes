@@ -41,16 +41,16 @@ const QuizResultsPage: React.FC = () => {
 
   const { quiz, selectedAnswers, results, score, total, courseId } = state;
 
-  const formatUserAnswer = (answer: string | string[] | undefined): string => {
+  const formatUserAnswer = (answer: string | string[] | undefined): string | string[] => {
     if (!answer) return "No answer submitted";
     if (Array.isArray(answer)) {
       if (answer.length === 0) return "No answer submitted";
-      return answer.join(", ");
+      return answer;
     }
     return answer;
   };
 
-  const formatCorrectAnswer = (questionType: QuestionType, rawAnswer: string | string[]): string => {
+  const formatCorrectAnswer = (questionType: QuestionType, rawAnswer: string | string[]): string | string[] => {
     if (questionType === QuestionType.MULTIPLE_ANSWER) {
       let correctAnswerArray: string[] = [];
 
@@ -69,13 +69,13 @@ const QuizResultsPage: React.FC = () => {
       }
 
       if (correctAnswerArray.length === 0) return "No correct answers configured";
-      return correctAnswerArray.join(", ");
+      return correctAnswerArray;
     }
 
     if (questionType === QuestionType.SHORT_ANSWER) {
       if (Array.isArray(rawAnswer)) {
         if (rawAnswer.length === 0) return "No correct answers configured";
-        return rawAnswer.join(", ");
+        return rawAnswer;
       }
       return rawAnswer || "No correct answer configured";
     }
@@ -88,8 +88,30 @@ const QuizResultsPage: React.FC = () => {
     return rawAnswer || "No correct answer configured";
   };
 
+  const renderAnswer = (answer: string | string[]): React.ReactNode => {
+    if (typeof answer === "string") {
+      return <MarkdownRenderer content={answer} />;
+    }
+    if (Array.isArray(answer)) {
+      return (
+        <ul className="list-disc list-inside space-y-1">
+          {answer.map((item, idx) => (
+            <li key={idx}>
+              <MarkdownRenderer content={item} />
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    return <span>{answer}</span>;
+  };
+
   const handleRetry = () => {
     navigate(`/courses/${courseId}/quizzes/${quiz.id}`);
+  };
+
+  const handleBack = () => {
+    navigate(`/course/${courseId}`);
   };
 
   return (
@@ -105,7 +127,6 @@ const QuizResultsPage: React.FC = () => {
           {quiz.content.map((question) => {
             const userAnswer = selectedAnswers[question.question_number];
             const isCorrect = results[question.question_number];
-            const correctAnswer = formatCorrectAnswer(question.question_type, question.question_answer);
 
             return (
               <div
@@ -119,22 +140,29 @@ const QuizResultsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="space-y-1 text-sm">
+                <div className="space-y-2 text-sm">
                   <p className={isCorrect ? "text-green-600" : "text-destructive"}>
                     {isCorrect ? "Your answer is correct." : "Your answer is incorrect."}
                   </p>
-                  <p>
-                    <span className="font-semibold">Your answer:</span>{" "}
-                    <span>{formatUserAnswer(userAnswer)}</span>
-                  </p>
-                  <p>
-                    <span className="font-semibold">Correct answer:</span>{" "}
-                    <span>{correctAnswer}</span>
-                  </p>
+                  <div>
+                    <span className="font-semibold">Your answer:</span>
+                    <div className="mt-1 ml-0">
+                      {renderAnswer(formatUserAnswer(userAnswer))}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="font-semibold">Correct answer:</span>
+                    <div className="mt-1 ml-0">
+                      {renderAnswer(formatCorrectAnswer(question.question_type, question.question_answer))}
+                    </div>
+                  </div>
                   {question.question_hint && (
-                    <p className="text-muted-foreground">
-                      <span className="font-semibold"></span> {question.question_hint}
-                    </p>
+                    <div className="text-muted-foreground">
+                      <span className="font-semibold">Feedback:</span>
+                      <div className="mt-1 ml-0">
+                        <MarkdownRenderer content={question.question_hint} />
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -144,7 +172,12 @@ const QuizResultsPage: React.FC = () => {
             <span className="font-medium">
               Score: {score} / {total}
             </span>
-            <Button onClick={handleRetry}>Retry Quiz</Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={handleBack}>
+                Back
+              </Button>
+              <Button onClick={handleRetry}>Retry Quiz</Button>
+            </div>
           </div>
         </CardContent>
       </Card>
