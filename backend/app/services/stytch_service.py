@@ -181,7 +181,7 @@ class StytchService:
             # Ask Stytch to create a session and return a session_token
             stytch_response = self.client.magic_links.authenticate(
                 token=token,
-                session_duration_minutes=60,
+                session_duration_minutes=60 * 24 * 30, # 30 days
             )
             user_obj = getattr(stytch_response, "user", None)
             stytch_user_id = self._extract_user_id(user_obj) or getattr(stytch_response, "user_id", None)
