@@ -6,6 +6,7 @@ import { Skeleton } from './ui/skeleton';
 import { CheckCircleIcon, ClockIcon, PlayIcon, XCircleIcon } from 'lucide-react';
 import { QuizProgress, QuizProgressStatus } from "../types/progress";
 import { useUserApi } from '../hooks/useUserApi';
+import { getApiErrorMessage } from "@/lib/utils";
 
 interface QuizProgressListProps {}
 
@@ -69,7 +70,7 @@ const QuizProgressList: React.FC<QuizProgressListProps> = () => {
         const response = await userApi.getMyQuizProgress();
         setProgressList(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        setError(getApiErrorMessage(err, 'An unknown error occurred'));
       } finally {
         setLoading(false);
       }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "../services/api";
+import { getApiErrorMessage } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { CourseOut } from "../types/course";
@@ -16,8 +17,8 @@ const HomePage: React.FC = () => {
       try {
         const res = await apiService.getCourses();
         setCourses(res.data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(getApiErrorMessage(err));
       } finally {
         setLoading(false);
       }

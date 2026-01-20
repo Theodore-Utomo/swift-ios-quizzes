@@ -12,6 +12,7 @@ import QuizEditor from "./QuizEditor";
 import { apiService } from "../../services/api";
 import { Quiz } from "../../types/quiz";
 import { CourseOut } from "../../types/course";
+import { getApiErrorMessage } from "@/lib/utils";
 
 interface CourseData extends CourseOut {
   quiz_count?: number;
@@ -59,7 +60,7 @@ const InstructorDashboard: React.FC = () => {
       
       setCourses(coursesWithQuizCount);
     } catch (error: any) {
-      setError(error.message);
+      setError(getApiErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -71,7 +72,7 @@ const InstructorDashboard: React.FC = () => {
       const res = await apiService.getCourseQuizzes(courseId);
       setQuizzes(res.data);
     } catch (error: any) {
-      setError(error.message);
+      setError(getApiErrorMessage(error));
     }
   };
 
@@ -96,7 +97,7 @@ const InstructorDashboard: React.FC = () => {
       setNewCourseName("");
       setIsCreateCourseOpen(false);
     } catch (error: any) {
-      setError(error.message);
+      setError(getApiErrorMessage(error));
     }
   };
 
@@ -115,7 +116,7 @@ const InstructorDashboard: React.FC = () => {
         setSelectedCourse({ ...editingCourse, name: editCourseName });
       }
     } catch (error: any) {
-      setError(error.message);
+      setError(getApiErrorMessage(error));
     }
   };
 
@@ -129,7 +130,7 @@ const InstructorDashboard: React.FC = () => {
         setQuizzes([]);
       }
     } catch (error: any) {
-      setError(error.message);
+      setError(getApiErrorMessage(error));
     }
   };
 
@@ -145,7 +146,7 @@ const InstructorDashboard: React.FC = () => {
       setIsCreateQuizOpen(false);
       setNewQuizName("");
     } catch (error: any) {
-      setError(error.message);
+      setError(getApiErrorMessage(error));
     }
   };
 
@@ -159,7 +160,7 @@ const InstructorDashboard: React.FC = () => {
       setEditingQuiz(null);
       setIsEditQuizOpen(false);
     } catch (error: any) {
-      setError(error.message);
+      setError(getApiErrorMessage(error));
     }
   };
 
@@ -172,7 +173,7 @@ const InstructorDashboard: React.FC = () => {
       await fetchQuizzes(selectedCourse.id);
       await fetchCourses();
     } catch (error: any) {
-      setError(error.message);
+      setError(getApiErrorMessage(error));
     }
   };
 

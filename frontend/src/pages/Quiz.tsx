@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import QuizComponent from '../components/quiz/QuizComponent';
 import { Quiz } from '../types/quiz';
 import { apiService } from "../services/api";
+import { getApiErrorMessage } from "@/lib/utils";
 
 const QuizPage: React.FC = () => {
   const { courseId, quizId } = useParams<{ courseId: string; quizId: string }>();
@@ -16,7 +17,7 @@ const QuizPage: React.FC = () => {
         const response = await apiService.getQuiz(courseId!, quizId!);
         setQuiz(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        setError(getApiErrorMessage(err, 'An unknown error occurred'));
       } finally {
         setLoading(false);
       }

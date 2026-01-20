@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiService } from "../services/api";
+import { getApiErrorMessage } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Quiz } from "../types/quiz";
@@ -22,8 +23,8 @@ const CourseDetails: React.FC = () => {
 
         const quizzesRes = await apiService.getCourseQuizzes(courseId!);
         setQuizzes(quizzesRes.data);
-      } catch (err: any) {
-        setError(err.message || "Something went wrong");
+      } catch (err: unknown) {
+        setError(getApiErrorMessage(err, "Something went wrong"));
       } finally {
         setLoading(false);
       }

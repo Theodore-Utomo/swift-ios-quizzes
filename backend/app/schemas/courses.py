@@ -19,8 +19,8 @@ class CourseCreate(BaseModel):
         # Remove excessive whitespace
         v = re.sub(r'\s+', ' ', v.strip())
         
-        # Check for valid characters (letters, numbers, spaces, basic punctuation)
-        if not re.match(r'^[a-zA-Z0-9\s\-_().,]+$', v):
+        # Check for valid characters (letters, numbers, spaces, basic punctuation, and apostrophe)
+        if not re.match(r'^[a-zA-Z0-9\s\-_().,:&;#\'"]+$', v):
             raise ValueError('Course name contains invalid characters')
         
         return v
