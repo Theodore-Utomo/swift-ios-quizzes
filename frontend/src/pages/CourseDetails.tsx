@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiService } from "../services/api";
 import { getApiErrorMessage } from "@/lib/utils";
@@ -31,6 +31,12 @@ const CourseDetails: React.FC = () => {
     };
     fetchData();
   }, [courseId]);
+
+  const sortedQuizzes = useMemo(() => {
+    const cleaned = quizzes.map(q => ({ ...q, name: q.name.trim() }));
+    const sorted = [...cleaned].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    return sorted;
+  }, [quizzes]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -90,7 +96,7 @@ const CourseDetails: React.FC = () => {
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {quizzes.map((quiz) => (
+          {sortedQuizzes.map((quiz) => (
             <Card key={quiz.id} className="group">
               <CardHeader>
                 <CardTitle>{quiz.name}</CardTitle>
