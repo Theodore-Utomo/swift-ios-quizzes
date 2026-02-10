@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CreateQuizDialog } from "./CreateQuizDialog";
@@ -21,7 +21,11 @@ interface QuizzesTabProps {
   handleDeleteQuiz: (quizId: string) => void;
   openEditQuiz: (quiz: Quiz) => void;
   closeEditQuiz: () => void;
+
+  
 }
+
+
 
 export const QuizzesTab: React.FC<QuizzesTabProps> = ({
   selectedCourse,
@@ -37,8 +41,15 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
   handleDeleteQuiz,
   openEditQuiz,
   closeEditQuiz,
-}) => (
-  <div className="space-y-4">
+}) => {
+  const sortedQuizzes = useMemo(() => {
+    const cleaned = quizzes.map(q => ({ ...q, name: q.name.trim() }));
+    const sorted = [...cleaned].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    return sorted;
+  }, [quizzes]);
+
+  return (
+    <div className="space-y-4">
     <div className="flex justify-between items-center">
       <div>
         <h2 className="text-2xl font-bold">Quizzes for {selectedCourse.name}</h2>
@@ -66,7 +77,7 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
     />
 
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {quizzes.map((quiz) => (
+      {sortedQuizzes.map((quiz) => (
         <QuizCard
           key={quiz.id}
           quiz={quiz}
@@ -88,5 +99,6 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
         onCancel={closeEditQuiz}
       />
     )}
-  </div>
-);
+    </div>
+  );
+};

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiService } from "../services/api";
 import { getApiErrorMessage } from "@/lib/utils";
@@ -14,6 +14,13 @@ const CourseDetails: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
+
+  const sortedQuizzes = useMemo(() => {
+    const cleaned = quizzes.map(q => ({...q, name: q.name.trim()}))
+    const sorted = [...cleaned].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })); 
+    return sorted;
+
+  }, [quizzes]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,7 +97,7 @@ const CourseDetails: React.FC = () => {
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {quizzes.map((quiz) => (
+          {sortedQuizzes.map((quiz) => (
             <Card key={quiz.id} className="group">
               <CardHeader>
                 <CardTitle>{quiz.name}</CardTitle>
