@@ -71,6 +71,7 @@ const InstructorDashboard: React.FC = () => {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="courses">Manage Courses</TabsTrigger>
           {selectedCourse && <TabsTrigger value="quizzes">Manage Quizzes</TabsTrigger>}
+          <TabsTrigger value="metrics">Metrics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -118,6 +119,9 @@ const InstructorDashboard: React.FC = () => {
             />
           </TabsContent>
         )}
+
+        <TabsContent value="metrics" className="space-y-4">
+        </TabsContent>
       </Tabs>
     </div>
   );
