@@ -39,8 +39,10 @@ export const QuizzesTab: React.FC<QuizzesTabProps> = ({
   closeEditQuiz,
 }) => {
   const sortedQuizzes = useMemo(() => {
-    const cleaned = quizzes.map(q => ({ ...q, name: q.name.trim() }));
-    const sorted = [...cleaned].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    const cleaned = quizzes.map((q) => ({ ...q, name: q.name.trim() }));
+    const sorted = [...cleaned].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+    );
     return sorted;
   }, [quizzes]);
 

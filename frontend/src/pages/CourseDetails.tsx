@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiService } from "../services/api";
 import { getApiErrorMessage } from "@/lib/utils";
@@ -33,8 +33,10 @@ const CourseDetails: React.FC = () => {
   }, [courseId]);
 
   const sortedQuizzes = useMemo(() => {
-    const cleaned = quizzes.map(q => ({ ...q, name: q.name.trim() }));
-    const sorted = [...cleaned].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    const cleaned = quizzes.map((q) => ({ ...q, name: q.name.trim() }));
+    const sorted = [...cleaned].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+    );
     return sorted;
   }, [quizzes]);
 
