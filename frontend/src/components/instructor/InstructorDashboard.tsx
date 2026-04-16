@@ -4,6 +4,7 @@ import { useInstructorDashboard } from "./hooks/useInstructorDashboard";
 import { OverviewTab } from "./OverviewTab";
 import { CoursesTab } from "./CoursesTab";
 import { QuizzesTab } from "./QuizzesTab";
+import { MetricsTab } from "./MetricsTab";
 
 const InstructorDashboard: React.FC = () => {
   const {
@@ -71,6 +72,7 @@ const InstructorDashboard: React.FC = () => {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="courses">Manage Courses</TabsTrigger>
           {selectedCourse && <TabsTrigger value="quizzes">Manage Quizzes</TabsTrigger>}
+          <TabsTrigger value="metrics">Metrics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -118,6 +120,10 @@ const InstructorDashboard: React.FC = () => {
             />
           </TabsContent>
         )}
+
+        <TabsContent value="metrics" className="space-y-4">
+          <MetricsTab />
+        </TabsContent>
       </Tabs>
     </div>
   );

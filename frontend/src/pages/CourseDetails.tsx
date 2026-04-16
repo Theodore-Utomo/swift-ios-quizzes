@@ -15,13 +15,6 @@ const CourseDetails: React.FC = () => {
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
-  const sortedQuizzes = useMemo(() => {
-    const cleaned = quizzes.map(q => ({...q, name: q.name.trim()}))
-    const sorted = [...cleaned].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })); 
-    return sorted;
-
-  }, [quizzes]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -38,6 +31,14 @@ const CourseDetails: React.FC = () => {
     };
     fetchData();
   }, [courseId]);
+
+  const sortedQuizzes = useMemo(() => {
+    const cleaned = quizzes.map((q) => ({ ...q, name: q.name.trim() }));
+    const sorted = [...cleaned].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+    );
+    return sorted;
+  }, [quizzes]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
