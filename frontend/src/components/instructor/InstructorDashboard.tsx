@@ -4,6 +4,7 @@ import { useInstructorDashboard } from "./hooks/useInstructorDashboard";
 import { OverviewTab } from "./OverviewTab";
 import { CoursesTab } from "./CoursesTab";
 import { QuizzesTab } from "./QuizzesTab";
+import { MetricsTab } from "./MetricsTab";
 
 const InstructorDashboard: React.FC = () => {
   const {
@@ -121,6 +122,7 @@ const InstructorDashboard: React.FC = () => {
         )}
 
         <TabsContent value="metrics" className="space-y-4">
+          <MetricsTab />
         </TabsContent>
       </Tabs>
     </div>

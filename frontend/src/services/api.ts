@@ -3,6 +3,7 @@ import { Quiz } from '../types/quiz';
 import { CourseCreate, CourseOut } from '../types/course';
 import { QuizProgress, QuizProgressSubmission } from '../types/progress';
 import { AuthRequest } from '../types/auth';
+import { MetricsOut } from '../types/metrics';
 
 export const API_URL = import.meta.env.VITE_API_URL;
 
@@ -75,6 +76,9 @@ export const apiService = {
         submitted_at: new Date().toISOString(),
         user_id: userId,
     }),
+
+    // Metrics
+    getMetrics: () => api.get<MetricsOut>('/metrics/metrics'),
 };
 
 
